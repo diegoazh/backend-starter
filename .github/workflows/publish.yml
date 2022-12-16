@@ -1,0 +1,40 @@
+name: publish
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publish:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 10
+      - name: Install dependencies
+        run: yarn
+      - name: Build monorepo
+        run: yarn run build
+      - name: Run lint
+        run: yarn run lint
+      - name: Run tests
+        run: yarn run test
+      - name: Configure git credentials
+        uses: OleksiyRudenko/gha-git-credentials@v1
+        with:
+          name: '${{ secrets.GH_USER }}'
+          email: '${{ secrets.GH_EMAIL }}'
+          actor: '${{ secrets.GH_FULL_NAME }}'
+          token: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Update origin push URI
+        run: |
+          git remote set-url origin "https://${{ secrets.GH_TOKEN_PROJECT_STARTER }}@github.com/${{ secrets.GH_USER }}/${{ secrets.GH_REPOSITORY }}.git" > /dev/null 2>&1
+          git checkout master
+      - name: Run lerna version
+        run: yarn run release
+      # - name: Publish new version to yarn
+      #   uses: JS-DevTools/yarn-publish@v1
+      #   with:
+      #     token: ${{ secrets.NPM_AUTH_TOKEN }}
+      #     package: ./packages/gmap-vue/package.json
