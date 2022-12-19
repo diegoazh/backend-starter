@@ -31,7 +31,6 @@ import { PatchCategoryDto } from '../dto/patch-category.dto';
 import { CategoriesCountResponse } from '../responses/categories-count.response';
 import { CategoriesResponse } from '../responses/categories.response';
 import { CategoryDeletedResponse } from '../responses/category-deleted.response';
-import { CategoryModel } from '../responses/category-swagger.model';
 import { CategoryResponse } from '../responses/category.response';
 import { CategoryService } from '../services/category.service';
 
@@ -53,9 +52,7 @@ export class CategoryController {
 
     return {
       data: {
-        categories: categories.map(
-          (category) => category.toJSON() as CategoryModel,
-        ),
+        categories: categories.map((category) => category.toJSON()),
       },
     };
   }
@@ -75,7 +72,7 @@ export class CategoryController {
       throw new NotFoundException('category_exception_not_found');
     }
 
-    return { data: { category: category.toJSON() as CategoryModel } };
+    return { data: { category: category.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -112,7 +109,7 @@ export class CategoryController {
   ): Promise<CategoryResponse> {
     const newCategory = await this.categoryService.create(categoryData);
 
-    return { data: { category: newCategory.toJSON() as CategoryModel } };
+    return { data: { category: newCategory.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -135,7 +132,7 @@ export class CategoryController {
       categoryData,
     );
 
-    return { data: { category: updatedCategory.toJSON() as CategoryModel } };
+    return { data: { category: updatedCategory.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -155,7 +152,7 @@ export class CategoryController {
   ): Promise<CategoryResponse> {
     const updateCategory = await this.categoryService.update(id, categoryData);
 
-    return { data: { category: updateCategory.toJSON() as CategoryModel } };
+    return { data: { category: updateCategory.toJSON() } };
   }
 
   @ApiOkResponse({

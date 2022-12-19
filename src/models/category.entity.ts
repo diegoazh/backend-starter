@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, HasMany, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
@@ -18,9 +19,11 @@ export class CategoryEntity extends BaseEntity<
   ICategoryAttributes,
   ICategoryCreationAttributes
 > {
+  @ApiProperty()
   @Column
   name: string;
 
+  @ApiProperty()
   @HasMany(() => PostEntity)
   posts: PostEntity[];
 }

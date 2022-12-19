@@ -1,9 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, DataType, HasMany, HasOne, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
+import { BaseEntity, IBaseAttributes, PostEntity, ProfileEntity } from '.';
 import { UserRole } from '../user/constants/user.constant';
-import { IBaseAttributes, BaseEntity, PostEntity, ProfileEntity } from '.';
 import { CommentEntity } from './comment.entity';
-import { UserModel } from '../user/responses/user-swagger.model';
 
 export interface IUserAttributes extends IBaseAttributes {
   email: string;
@@ -24,18 +24,23 @@ export class UserEntity extends BaseEntity<
   IUserAttributes,
   IUserCreationAttributes
 > {
+  @ApiProperty()
   @Column
   email: string;
 
+  @ApiProperty()
   @Column
   password: string;
 
+  @ApiProperty({ enum: Object.values(UserRole) })
   @Column({ type: DataType.ENUM, values: Object.values(UserRole) })
   role: typeof UserRole[keyof typeof UserRole];
 
+  @ApiProperty()
   @Column
   username?: string;
 
+  @ApiProperty()
   @Column
   image?: string;
 
@@ -48,7 +53,7 @@ export class UserEntity extends BaseEntity<
   @HasMany(() => CommentEntity)
   comments: CommentEntity[];
 
-  toJSON(): UserModel {
-    return { ...super.toJSON(), password: '' };
+  toJSON(): UserEntity {
+    return { ...super.toJSON(), password: '' } as any;
   }
 }

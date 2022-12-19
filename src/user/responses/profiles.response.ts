@@ -1,8 +1,8 @@
+import { ProfileEntity } from '../../models';
 import { ApiResponse } from '../../shared/interfaces/api.response';
-import { ProfileModel } from './profile-swagger.model';
 
-export class ProfilesResponse implements ApiResponse<ProfileModel[]> {
+export class ProfilesResponse implements ApiResponse<ProfileEntity[]> {
   data: {
-    profiles: ProfileModel[];
+    profiles: ProfileEntity[];
   };
 }

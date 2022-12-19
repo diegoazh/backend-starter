@@ -30,7 +30,6 @@ import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchTagDto } from '../dto/patch-tag.dto';
 import { UpdateTagDto } from '../dto/update-tag.dto';
 import { TagDeletedResponse } from '../responses/tag-deleted.response';
-import { TagModel } from '../responses/tag-swagger.model';
 import { TagResponse } from '../responses/tag.response';
 import { TagsCountResponse } from '../responses/tags-count.response';
 import { TagsResponse } from '../responses/tags.response';
@@ -72,7 +71,7 @@ export class TagController {
       throw new NotFoundException('tag_exception_not_found');
     }
 
-    return { data: { tag: tag.toJSON() as TagModel } };
+    return { data: { tag: tag.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -107,7 +106,7 @@ export class TagController {
   public async create(@Body() tagData: CreateTagDto): Promise<TagResponse> {
     const newTag = await this.tagService.create(tagData);
 
-    return { data: { tag: newTag.toJSON() as TagModel } };
+    return { data: { tag: newTag.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -127,7 +126,7 @@ export class TagController {
   ): Promise<TagResponse> {
     const updatedTag = await this.tagService.overwrite(id, tagData);
 
-    return { data: { tag: updatedTag.toJSON() as TagModel } };
+    return { data: { tag: updatedTag.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -147,7 +146,7 @@ export class TagController {
   ): Promise<TagResponse> {
     const updateCategory = await this.tagService.update(id, tagData);
 
-    return { data: { tag: updateCategory.toJSON() as TagModel } };
+    return { data: { tag: updateCategory.toJSON() } };
   }
 
   @ApiOkResponse({

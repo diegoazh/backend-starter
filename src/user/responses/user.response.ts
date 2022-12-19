@@ -1,8 +1,8 @@
+import { UserEntity } from '../../models';
 import { ApiResponse } from '../../shared/interfaces/api.response';
-import { UserModel } from './user-swagger.model';
 
-export class UserResponse implements ApiResponse<UserModel> {
+export class UserResponse implements ApiResponse<UserEntity> {
   data: {
-    user: UserModel;
+    user: UserEntity;
   };
 }

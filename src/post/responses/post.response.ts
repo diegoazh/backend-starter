@@ -1,8 +1,8 @@
+import { PostEntity } from '../../models';
 import { ApiResponse } from '../../shared/interfaces/api.response';
-import { PostModel } from './post-swagger.model';
 
-export class PostResponse implements ApiResponse<PostModel> {
+export class PostResponse implements ApiResponse<PostEntity> {
   data: {
-    post: PostModel;
+    post: PostEntity;
   };
 }

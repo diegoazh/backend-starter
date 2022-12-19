@@ -1,8 +1,8 @@
+import { CategoryEntity } from '../../models';
 import { ApiResponse } from '../../shared/interfaces/api.response';
-import { CategoryModel } from './category-swagger.model';
 
-export class CategoriesResponse implements ApiResponse<CategoryModel[]> {
+export class CategoriesResponse implements ApiResponse<CategoryEntity[]> {
   data: {
-    categories: CategoryModel[];
+    categories: CategoryEntity[];
   };
 }

@@ -32,7 +32,6 @@ import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { ProfileDeletedResponse } from '../responses/profile-deleted.response';
-import { ProfileModel } from '../responses/profile-swagger.model';
 import { ProfileResponse } from '../responses/profile.response';
 import { ProfilesCountResponse } from '../responses/profiles-count.response';
 import { ProfilesResponse } from '../responses/profiles.response';
@@ -59,7 +58,7 @@ export class ProfileController {
 
     return {
       data: {
-        profiles: profiles.map((profile) => profile.toJSON() as ProfileModel),
+        profiles: profiles.map((profile) => profile.toJSON()),
       },
     };
   }
@@ -82,7 +81,7 @@ export class ProfileController {
       throw new NotFoundException('profile_exception_not_found');
     }
 
-    return { data: { profile: profile.toJSON() as ProfileModel } };
+    return { data: { profile: profile.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -122,7 +121,7 @@ export class ProfileController {
   ): Promise<ProfileResponse> {
     const newProfile = await this.profileService.create(profile, req.user);
 
-    return { data: { profile: newProfile.toJSON() as ProfileModel } };
+    return { data: { profile: newProfile.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -140,7 +139,7 @@ export class ProfileController {
   ): Promise<ProfileResponse> {
     const updatedProfile = await this.profileService.overwrite(id, profile);
 
-    return { data: { profile: updatedProfile.toJSON() as ProfileModel } };
+    return { data: { profile: updatedProfile.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -158,7 +157,7 @@ export class ProfileController {
   ): Promise<ProfileResponse> {
     const updatedProfile = await this.profileService.update(id, profile);
 
-    return { data: { profile: updatedProfile.toJSON() as ProfileModel } };
+    return { data: { profile: updatedProfile.toJSON() } };
   }
 
   @ApiOkResponse({

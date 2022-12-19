@@ -1,8 +1,8 @@
+import { TagEntity } from '../../models';
 import { ApiResponse } from '../../shared/interfaces/api.response';
-import { TagModel } from './tag-swagger.model';
 
-export class TagsResponse implements ApiResponse<TagModel[]> {
+export class TagsResponse implements ApiResponse<TagEntity[]> {
   data: {
-    tags: TagModel[];
+    tags: TagEntity[];
   };
 }

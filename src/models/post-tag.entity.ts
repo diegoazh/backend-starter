@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Column, ForeignKey, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
@@ -20,10 +21,12 @@ export class PostTagEntity extends BaseEntity<
   IPostTagAttributes,
   IPostTagCreationAttributes
 > {
+  @ApiProperty()
   @ForeignKey(() => PostEntity)
   @Column
   postId: string;
 
+  @ApiProperty()
   @ForeignKey(() => TagEntity)
   @Column
   tagId: string;

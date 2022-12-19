@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { BelongsTo, Column, ForeignKey, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
@@ -19,15 +20,18 @@ export class CommentEntity extends BaseEntity<
   ICommentAttributes,
   ICommentCreationAttributes
 > {
+  @ApiProperty()
   @Column
   content: string;
 
+  @ApiProperty()
   @ForeignKey(() => UserEntity)
   authorId: string;
 
   @BelongsTo(() => UserEntity)
   author: UserEntity;
 
+  @ApiProperty()
   @ForeignKey(() => PostEntity)
   postId: string;
 

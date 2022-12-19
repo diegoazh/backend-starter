@@ -32,7 +32,7 @@ import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostDeletedResponse } from '../responses/post-deleted.response';
-import { PostModel } from '../responses/post-swagger.model';
+// import { PostModel } from '../responses/post-swagger.model';
 import { PostResponse } from '../responses/post.response';
 import { PostsCountResponse } from '../responses/posts-count.response';
 import { PostsResponse } from '../responses/posts.response';
@@ -52,7 +52,9 @@ export class PostController {
   async find(@Query() query?: IAppQueryString): Promise<PostsResponse> {
     const posts = await this.postService.find(query);
 
-    return { data: { posts: posts.map((post) => post.toJSON() as PostModel) } };
+    return {
+      data: { posts: posts.map((post) => post.toJSON()) },
+    };
   }
 
   @ApiFoundResponse({
@@ -70,7 +72,7 @@ export class PostController {
       throw new NotFoundException('post_exception_not_found');
     }
 
-    return { data: { post: post.toJSON() as PostModel } };
+    return { data: { post: post.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -108,7 +110,7 @@ export class PostController {
   ): Promise<PostResponse> {
     const newPost = await this.postService.create(postData, req.user);
 
-    return { data: { post: newPost.toJSON() as PostModel } };
+    return { data: { post: newPost.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -128,7 +130,7 @@ export class PostController {
   ): Promise<PostResponse> {
     const updatedPost = await this.postService.overwrite(id, postData);
 
-    return { data: { post: updatedPost.toJSON() as PostModel } };
+    return { data: { post: updatedPost.toJSON() } };
   }
 
   @ApiOkResponse({
@@ -148,7 +150,7 @@ export class PostController {
   ): Promise<PostResponse> {
     const updatedPost = await this.postService.update(id, postData);
 
-    return { data: { post: updatedPost.toJSON() as PostModel } };
+    return { data: { post: updatedPost.toJSON() } };
   }
 
   @ApiOkResponse({

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreatedAt,
@@ -15,6 +16,7 @@ export interface IBaseAttributes {
 }
 
 export abstract class BaseEntity<T, U> extends Model<T, U> {
+  @ApiProperty()
   @Column({
     primaryKey: true,
     allowNull: false,
@@ -23,12 +25,15 @@ export abstract class BaseEntity<T, U> extends Model<T, U> {
   })
   id: string;
 
+  @ApiProperty()
   @CreatedAt
   createdAt: Date;
 
+  @ApiProperty()
   @UpdatedAt
   updatedAt: Date;
 
+  @ApiProperty()
   @DeletedAt
   deletedAt: Date;
 }
