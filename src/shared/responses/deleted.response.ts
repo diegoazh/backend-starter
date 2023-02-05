@@ -1,6 +1,6 @@
-import { ApiResponse } from '../interfaces/api-response.interface';
+import { IApiResponse } from '../interfaces/api-response.interface';
 
-export class DeleteResponse implements ApiResponse<number> {
+export class DeleteResponse implements IApiResponse<number> {
   data: {
     deleted: number;
   };

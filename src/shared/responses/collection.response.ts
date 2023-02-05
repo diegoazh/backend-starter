@@ -1,6 +1,6 @@
-import { ApiResponse } from '../interfaces/api-response.interface';
+import { IApiResponse } from '../interfaces/api-response.interface';
 
-export class CollectionResponse<T> implements ApiResponse<T> {
+export class CollectionResponse<T> implements IApiResponse<T> {
   data: {
     items: T;
   };

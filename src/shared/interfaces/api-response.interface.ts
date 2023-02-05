@@ -1,6 +1,6 @@
 import { DataResponseKeys } from '../enums/app.enums';
 
-export interface ApiResponse<T> {
+export interface IApiResponse<T> {
   links?: {
     self: string;
     prev?: string;
