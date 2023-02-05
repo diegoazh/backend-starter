@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BelongsTo, Column, ForeignKey, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
-import { IBaseAttributes, BaseEntity, UserEntity } from '.';
+import { BaseEntity, IBaseAttributes, UserEntity } from '.';
 
 export interface IProfileAttributes extends IBaseAttributes {
   bio?: string;

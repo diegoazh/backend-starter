@@ -24,15 +24,18 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { JwtAuthGuard } from '../../auth/guards';
+import { TagEntity } from '../../models';
+import { IAppQueryString } from '../../shared/interfaces';
+import {
+  CollectionResponse,
+  CountResponse,
+  DeleteResponse,
+  EntityResponse,
+} from '../../shared/responses';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchTagDto } from '../dto/patch-tag.dto';
 import { UpdateTagDto } from '../dto/update-tag.dto';
-import { TagDeletedResponse } from '../responses/tag-deleted.response';
-import { TagResponse } from '../responses/tag.response';
-import { TagsCountResponse } from '../responses/tags-count.response';
-import { TagsResponse } from '../responses/tags.response';
 import { TagService } from '../services/tag.service';
 
 @ApiTags('Tags controller')
@@ -41,41 +44,45 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @ApiOkResponse({
-    type: TagsResponse,
+    type: CollectionResponse<TagEntity[]>,
     description: 'A list of tags',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get()
-  public async find(@Query() query?: IAppQueryString): Promise<TagsResponse> {
+  public async find(
+    @Query() query?: IAppQueryString,
+  ): Promise<CollectionResponse<TagEntity[]>> {
     const tags = await this.tagService.find(query);
 
     return {
       data: {
-        tags: tags.map((tag) => tag.toJSON()),
+        items: tags.map((tag) => tag.toJSON()),
       },
     };
   }
 
   @ApiFoundResponse({
-    type: TagResponse,
+    type: EntityResponse<TagEntity>,
     description: 'A found tag',
   })
   @ApiNotFoundResponse({ description: 'Any tag was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
   @Get(':id')
-  public async findById(@Param('id') id: string): Promise<TagResponse> {
+  public async findById(
+    @Param('id') id: string,
+  ): Promise<EntityResponse<TagEntity>> {
     const tag = await this.tagService.findById(id);
 
     if (!tag) {
       throw new NotFoundException('tag_exception_not_found');
     }
 
-    return { data: { tag: tag.toJSON() } };
+    return { data: { item: tag.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: TagsCountResponse,
+    type: CountResponse,
     description: 'A sum of all categories in the system',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -83,14 +90,14 @@ export class TagController {
   async count(
     @Query()
     query?: IAppQueryString,
-  ): Promise<TagsCountResponse> {
+  ): Promise<CountResponse> {
     const { count } = await this.tagService.count(query);
 
-    return { data: { tags: { count } } };
+    return { data: { count } };
   }
 
   @ApiCreatedResponse({
-    type: TagResponse,
+    type: EntityResponse<TagEntity>,
     description: 'The tag was created successfully',
   })
   @ApiConflictResponse({
@@ -103,14 +110,16 @@ export class TagController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  public async create(@Body() tagData: CreateTagDto): Promise<TagResponse> {
+  public async create(
+    @Body() tagData: CreateTagDto,
+  ): Promise<EntityResponse<TagEntity>> {
     const newTag = await this.tagService.create(tagData);
 
-    return { data: { tag: newTag.toJSON() } };
+    return { data: { item: newTag.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: TagResponse,
+    type: EntityResponse<TagEntity>,
     description: 'The tag was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -123,14 +132,14 @@ export class TagController {
   public async overwrite(
     @Param('id') id: string,
     @Body() tagData: UpdateTagDto,
-  ): Promise<TagResponse> {
+  ): Promise<EntityResponse<TagEntity>> {
     const updatedTag = await this.tagService.overwrite(id, tagData);
 
-    return { data: { tag: updatedTag.toJSON() } };
+    return { data: { item: updatedTag.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: TagResponse,
+    type: EntityResponse<TagEntity>,
     description: 'The tag was updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -143,14 +152,14 @@ export class TagController {
   async update(
     @Param('id') id: string,
     tagData: PatchTagDto,
-  ): Promise<TagResponse> {
+  ): Promise<EntityResponse<TagEntity>> {
     const updateCategory = await this.tagService.update(id, tagData);
 
-    return { data: { tag: updateCategory.toJSON() } };
+    return { data: { item: updateCategory.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: TagDeletedResponse,
+    type: DeleteResponse,
     description: 'The tag was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -160,9 +169,9 @@ export class TagController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<TagDeletedResponse> {
+  async remove(@Param('id') id: string): Promise<DeleteResponse> {
     const { deleted } = await this.tagService.remove(id);
 
-    return { data: { tags: { deleted } } };
+    return { data: { deleted } };
   }
 }

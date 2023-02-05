@@ -3,7 +3,7 @@ import {
   authServiceMockFactory,
   mockServiceFactory,
 } from '../../../test/utils/utils';
-import { CreateUserDto } from '../../user/dto/create-user.dto';
+import { CreateUserDto } from '../../user/dto';
 import { UserService } from '../../user/services/user.service';
 import { AuthService } from '../services/auth.service';
 import { AuthController } from './auth.controller';

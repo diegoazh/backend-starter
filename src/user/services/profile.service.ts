@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProfileEntity, UserEntity } from '../../models';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { IAppQueryString } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';

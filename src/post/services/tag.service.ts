@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PostEntity, TagEntity } from '../../models';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { IAppQueryString } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';

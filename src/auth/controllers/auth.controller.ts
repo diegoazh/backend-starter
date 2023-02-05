@@ -14,12 +14,12 @@ import {
   ApiInternalServerErrorResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateUserDto } from '../../user/dto/create-user.dto';
-import { UserResponse } from '../../user/responses/user.response';
+import { UserEntity } from '../../models';
+import { EntityResponse, LoginResponse } from '../../shared/responses';
+import { CreateUserDto } from '../../user/dto';
 import { UserService } from '../../user/services/user.service';
 import { CredentialsDto } from '../dto/credentials.dto';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { LoginResponse } from '../responses/login.response';
 import { AuthService } from '../services/auth.service';
 import { AuthenticatedRequest } from '../types/authenticated-request.type';
 
@@ -48,7 +48,7 @@ export class AuthController {
   }
 
   @ApiCreatedResponse({
-    type: UserResponse,
+    type: EntityResponse<UserEntity>,
     description: 'A user was created successfully',
   })
   @ApiConflictResponse({
@@ -57,9 +57,11 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  async create(@Body() user: CreateUserDto): Promise<UserResponse> {
+  async create(
+    @Body() user: CreateUserDto,
+  ): Promise<EntityResponse<UserEntity>> {
     const newUser = await this.userService.create(user);
 
-    return { data: { user: newUser.toJSON() } };
+    return { data: { item: newUser.toJSON() } };
   }
 }

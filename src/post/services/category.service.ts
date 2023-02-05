@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CategoryEntity, PostEntity } from '../../models';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { IAppQueryString } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';

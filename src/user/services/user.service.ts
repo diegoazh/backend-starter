@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PostEntity, ProfileEntity, UserEntity } from '../../models';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { IAppQueryString } from '../../shared/interfaces';
 import { BcryptService } from '../../shared/services/bcrypt.service';
 import { NodeConfigService } from '../../shared/services/node-config.service';
 import { UserRole } from '../constants/user.constant';

@@ -24,14 +24,17 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { JwtAuthGuard } from '../../auth/guards';
+import { CategoryEntity } from '../../models';
+import { IAppQueryString } from '../../shared/interfaces';
+import {
+  CollectionResponse,
+  CountResponse,
+  DeleteResponse,
+  EntityResponse,
+} from '../../shared/responses';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
-import { CategoriesCountResponse } from '../responses/categories-count.response';
-import { CategoriesResponse } from '../responses/categories.response';
-import { CategoryDeletedResponse } from '../responses/category-deleted.response';
-import { CategoryResponse } from '../responses/category.response';
 import { CategoryService } from '../services/category.service';
 
 @ApiTags('Categories controller')
@@ -40,43 +43,45 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @ApiOkResponse({
-    type: CategoriesResponse,
+    type: CollectionResponse<CategoryEntity[]>,
     description: 'A list of categories',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get()
   public async find(
     @Query() query?: IAppQueryString,
-  ): Promise<CategoriesResponse> {
+  ): Promise<CollectionResponse<CategoryEntity[]>> {
     const categories = await this.categoryService.find(query);
 
     return {
       data: {
-        categories: categories.map((category) => category.toJSON()),
+        items: categories.map((category) => category.toJSON()),
       },
     };
   }
 
   @ApiFoundResponse({
-    type: CategoryResponse,
+    type: EntityResponse<CategoryEntity>,
     description: 'A found category',
   })
   @ApiNotFoundResponse({ description: 'Any category was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
   @Get(':id')
-  public async findById(@Param('id') id: string): Promise<CategoryResponse> {
+  public async findById(
+    @Param('id') id: string,
+  ): Promise<EntityResponse<CategoryEntity>> {
     const category = await this.categoryService.findById(id);
 
     if (!category) {
       throw new NotFoundException('category_exception_not_found');
     }
 
-    return { data: { category: category.toJSON() } };
+    return { data: { item: category.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: CategoriesCountResponse,
+    type: CountResponse,
     description: 'A sum of all categories in the system',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -84,14 +89,14 @@ export class CategoryController {
   async count(
     @Query()
     query?: IAppQueryString,
-  ): Promise<CategoriesCountResponse> {
+  ): Promise<CountResponse> {
     const { count } = await this.categoryService.count(query);
 
-    return { data: { categories: { count } } };
+    return { data: { count } };
   }
 
   @ApiCreatedResponse({
-    type: CategoryResponse,
+    type: EntityResponse<CategoryEntity>,
     description: 'The category was created successfully',
   })
   @ApiConflictResponse({
@@ -106,14 +111,14 @@ export class CategoryController {
   @Post()
   public async create(
     @Body() categoryData: CreateCategoryDto,
-  ): Promise<CategoryResponse> {
+  ): Promise<EntityResponse<CategoryEntity>> {
     const newCategory = await this.categoryService.create(categoryData);
 
-    return { data: { category: newCategory.toJSON() } };
+    return { data: { item: newCategory.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: CategoryResponse,
+    type: EntityResponse<CategoryEntity>,
     description: 'The category was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -126,17 +131,17 @@ export class CategoryController {
   public async overwrite(
     @Param('id') id: string,
     @Body() categoryData: CreateCategoryDto,
-  ): Promise<CategoryResponse> {
+  ): Promise<EntityResponse<CategoryEntity>> {
     const updatedCategory = await this.categoryService.overwrite(
       id,
       categoryData,
     );
 
-    return { data: { category: updatedCategory.toJSON() } };
+    return { data: { item: updatedCategory.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: CategoryResponse,
+    type: EntityResponse<CategoryEntity>,
     description: 'The category was updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -149,14 +154,14 @@ export class CategoryController {
   async update(
     @Param('id') id: string,
     categoryData: PatchCategoryDto,
-  ): Promise<CategoryResponse> {
+  ): Promise<EntityResponse<CategoryEntity>> {
     const updateCategory = await this.categoryService.update(id, categoryData);
 
-    return { data: { category: updateCategory.toJSON() } };
+    return { data: { item: updateCategory.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: CategoryDeletedResponse,
+    type: DeleteResponse,
     description: 'The category was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -166,9 +171,9 @@ export class CategoryController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<CategoryDeletedResponse> {
+  async remove(@Param('id') id: string): Promise<DeleteResponse> {
     const { deleted } = await this.categoryService.remove(id);
 
-    return { data: { categories: { deleted } } };
+    return { data: { deleted } };
   }
 }

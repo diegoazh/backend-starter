@@ -25,16 +25,19 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards';
 import { AuthenticatedRequest } from '../../auth/types/authenticated-request.type';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { ProfileEntity } from '../../models';
+import { IAppQueryString } from '../../shared/interfaces';
+import {
+  CollectionResponse,
+  CountResponse,
+  DeleteResponse,
+  EntityResponse,
+} from '../../shared/responses';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { ProfileDeletedResponse } from '../responses/profile-deleted.response';
-import { ProfileResponse } from '../responses/profile.response';
-import { ProfilesCountResponse } from '../responses/profiles-count.response';
-import { ProfilesResponse } from '../responses/profiles.response';
 import { ProfileService } from '../services/profile.service';
 
 @ApiTags('Profiles controller')
@@ -45,7 +48,7 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @ApiOkResponse({
-    type: ProfilesResponse,
+    type: CollectionResponse<ProfileEntity[]>,
     description: 'A list of profiles',
   })
   @ApiUnauthorizedResponse({
@@ -53,18 +56,20 @@ export class ProfileController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get()
-  async find(@Query() query?: IAppQueryString): Promise<ProfilesResponse> {
+  async find(
+    @Query() query?: IAppQueryString,
+  ): Promise<CollectionResponse<ProfileEntity[]>> {
     const profiles = await this.profileService.find(query);
 
     return {
       data: {
-        profiles: profiles.map((profile) => profile.toJSON()),
+        items: profiles.map((profile) => profile.toJSON()),
       },
     };
   }
 
   @ApiFoundResponse({
-    type: ProfileResponse,
+    type: EntityResponse<ProfileEntity>,
     description: 'A profile object that match with the provided id',
   })
   @ApiNotFoundResponse({ description: 'Profile not found' })
@@ -74,18 +79,20 @@ export class ProfileController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
   @Get(':id')
-  async findById(@Param('id') id: string): Promise<ProfileResponse> {
+  async findById(
+    @Param('id') id: string,
+  ): Promise<EntityResponse<ProfileEntity>> {
     const profile = await this.profileService.findById(id);
 
     if (!profile) {
       throw new NotFoundException('profile_exception_not_found');
     }
 
-    return { data: { profile: profile.toJSON() } };
+    return { data: { item: profile.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: ProfilesCountResponse,
+    type: CountResponse,
     description: 'A sum of profiles found in the system',
   })
   @ApiUnauthorizedResponse({
@@ -96,14 +103,14 @@ export class ProfileController {
   async count(
     @Query()
     query?: IAppQueryString,
-  ): Promise<ProfilesCountResponse> {
+  ): Promise<CountResponse> {
     const { count } = await this.profileService.count(query);
 
-    return { data: { profiles: { count } } };
+    return { data: { count } };
   }
 
   @ApiCreatedResponse({
-    type: ProfileResponse,
+    type: EntityResponse<ProfileEntity>,
     description: 'A profile was created successfully',
   })
   @ApiConflictResponse({
@@ -118,14 +125,14 @@ export class ProfileController {
   async create(
     @Body() profile: CreateProfileDto,
     @Req() req: AuthenticatedRequest,
-  ): Promise<ProfileResponse> {
+  ): Promise<EntityResponse<ProfileEntity>> {
     const newProfile = await this.profileService.create(profile, req.user);
 
-    return { data: { profile: newProfile.toJSON() } };
+    return { data: { item: newProfile.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: ProfileResponse,
+    type: EntityResponse<ProfileEntity>,
     description: 'A profile was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -136,14 +143,14 @@ export class ProfileController {
   async overwrite(
     @Param('id') id: string,
     @Body() profile: UpdateProfileDto,
-  ): Promise<ProfileResponse> {
+  ): Promise<EntityResponse<ProfileEntity>> {
     const updatedProfile = await this.profileService.overwrite(id, profile);
 
-    return { data: { profile: updatedProfile.toJSON() } };
+    return { data: { item: updatedProfile.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: ProfileResponse,
+    type: EntityResponse<ProfileEntity>,
     description: 'A profile was updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -154,14 +161,14 @@ export class ProfileController {
   async update(
     @Param('id') id: string,
     profile: PatchProfileDto,
-  ): Promise<ProfileResponse> {
+  ): Promise<EntityResponse<ProfileEntity>> {
     const updatedProfile = await this.profileService.update(id, profile);
 
-    return { data: { profile: updatedProfile.toJSON() } };
+    return { data: { item: updatedProfile.toJSON() } };
   }
 
   @ApiOkResponse({
-    type: ProfileDeletedResponse,
+    type: DeleteResponse,
     description: 'A profile was removed successfully',
   })
   @ApiUnauthorizedResponse({
@@ -169,9 +176,9 @@ export class ProfileController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<ProfileDeletedResponse> {
+  async remove(@Param('id') id: string): Promise<DeleteResponse> {
     const { deleted } = await this.profileService.remove(id);
 
-    return { data: { profiles: { deleted } } };
+    return { data: { deleted } };
   }
 }

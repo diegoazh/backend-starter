@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { mockServiceFactory } from '../../../test/utils/utils';
-import { TagController } from './tag.controller';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchTagDto } from '../dto/patch-tag.dto';
 import { UpdateTagDto } from '../dto/update-tag.dto';
 import { TagService } from '../services/tag.service';
+import { TagController } from './tag.controller';
 
 describe('TagController', () => {
   let controller: TagController;

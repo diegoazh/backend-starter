@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PostEntity, ProfileEntity, UserEntity } from '../../models';
-import { IAppQueryString } from '../../shared/interfaces/app-query-string.interface';
+import { IAppQueryString } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
 import { UserWithoutPassword } from '../../user/types/user-types.type';
 import { CreatePostDto } from '../dto/create-post.dto';
