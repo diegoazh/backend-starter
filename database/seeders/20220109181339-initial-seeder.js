@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- js file */
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
@@ -19,7 +19,7 @@ module.exports = {
           id: uuidv4(),
           email: faker.internet.email(),
           password: bcrypt.hashSync('secret', bcrypt.genSaltSync(10)),
-          role: faker.random.arrayElement(['USER', 'ADMIN']),
+          role: faker.helpers.arrayElement(['USER', 'ADMIN']),
           username: faker.internet.userName(),
           image: faker.image.avatar(),
           createdAt: faker.date.recent(10, currentDate),
@@ -52,7 +52,7 @@ module.exports = {
       i = 25;
 
       while (i--) {
-        const type = faker.random.arrayElement(['TEXT', 'GALLERY']);
+        const type = faker.helpers.arrayElement(['TEXT', 'GALLERY']);
         const images = [];
 
         while (type === 'GALLERY' && images.length < 5) {
@@ -67,7 +67,7 @@ module.exports = {
           mainImage: faker.image.abstract(),
           images: images.join('|'),
           published: true,
-          authorId: users[faker.random.arrayElement([0, 1, 2, 3, 4])].id,
+          authorId: users[faker.helpers.arrayElement([0, 1, 2, 3, 4])].id,
           createdAt: faker.date.recent(10, currentDate),
           updatedAt: faker.date.recent(10, currentDate),
         });
