@@ -8,9 +8,14 @@ import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
   const configService = app.get(ConfigService);
   const logger = new Logger('Main');
+
+  // logger.debug(configService.get<string>('APP_CORS_ORIGIN'));
+
+  app.enableCors({
+    origin: JSON.parse(configService.get<string>('APP_CORS_ORIGIN')),
+  });
 
   app.use(helmet());
   app.useGlobalPipes(new ValidationPipe());

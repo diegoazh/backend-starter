@@ -42,7 +42,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOkResponse({
-    type: CollectionResponse<UserEntity[]>,
+    type: () => CollectionResponse<UserEntity[]>,
     description: 'A list of found users',
   })
   @ApiUnauthorizedResponse({
@@ -59,7 +59,7 @@ export class UserController {
   }
 
   @ApiFoundResponse({
-    type: EntityResponse<UserEntity>,
+    type: () => EntityResponse<UserEntity>,
     description: 'A user object that match with the provided id',
   })
   @ApiNotFoundResponse({ description: 'User not found' })
@@ -80,7 +80,7 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    type: CountResponse,
+    type: () => CountResponse,
     description: 'The sum of all users in the system',
   })
   @ApiUnauthorizedResponse({
@@ -98,7 +98,7 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<UserEntity>,
+    type: () => EntityResponse<UserEntity>,
     description: 'The user was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -116,7 +116,7 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<UserEntity>,
+    type: () => EntityResponse<UserEntity>,
     description: 'The properties of the user were updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -134,7 +134,7 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    type: DeleteResponse,
+    type: () => DeleteResponse,
     description: 'The user was deleted successfully',
   })
   @ApiUnauthorizedResponse({

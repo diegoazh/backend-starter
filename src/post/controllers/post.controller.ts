@@ -46,7 +46,7 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @ApiOkResponse({
-    type: CollectionResponse<PostEntity[]>,
+    type: () => CollectionResponse<PostEntity[]>,
     description: 'A list of posts',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -62,7 +62,7 @@ export class PostController {
   }
 
   @ApiFoundResponse({
-    type: EntityResponse<PostEntity>,
+    type: () => EntityResponse<PostEntity>,
     description: 'A found post',
   })
   @ApiNotFoundResponse({ description: 'Any post was found' })
@@ -80,7 +80,7 @@ export class PostController {
   }
 
   @ApiOkResponse({
-    type: CountResponse,
+    type: () => CountResponse,
     description: 'A sum of all posts in the system',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -95,7 +95,7 @@ export class PostController {
   }
 
   @ApiCreatedResponse({
-    type: EntityResponse<PostEntity>,
+    type: () => EntityResponse<PostEntity>,
     description: 'The post was created successfully',
   })
   @ApiConflictResponse({
@@ -118,7 +118,7 @@ export class PostController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<PostEntity>,
+    type: () => EntityResponse<PostEntity>,
     description: 'The post was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -138,7 +138,7 @@ export class PostController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<PostEntity>,
+    type: () => EntityResponse<PostEntity>,
     description: 'The post was updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -158,7 +158,7 @@ export class PostController {
   }
 
   @ApiOkResponse({
-    type: DeleteResponse,
+    type: () => DeleteResponse,
     description: 'The post was overwrite successfully',
   })
   @ApiUnauthorizedResponse({

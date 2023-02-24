@@ -33,7 +33,7 @@ export class TagSwaggerModel implements ITagAttributes {
   @ApiProperty()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => PostTagSwaggerModel })
   PostTagEntity: PostTagSwaggerModel;
 
   @ApiProperty()
@@ -74,7 +74,7 @@ export class PostSwaggerModel implements IPostAttributes {
   @ApiProperty()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => PostTagSwaggerModel })
   PostTagEntity: PostTagSwaggerModel;
 
   @ApiProperty()

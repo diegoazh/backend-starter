@@ -44,7 +44,7 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @ApiOkResponse({
-    type: CollectionResponse<TagEntity[]>,
+    type: () => CollectionResponse<TagEntity[]>,
     description: 'A list of tags',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -62,7 +62,7 @@ export class TagController {
   }
 
   @ApiFoundResponse({
-    type: EntityResponse<TagEntity>,
+    type: () => EntityResponse<TagEntity>,
     description: 'A found tag',
   })
   @ApiNotFoundResponse({ description: 'Any tag was found' })
@@ -82,7 +82,7 @@ export class TagController {
   }
 
   @ApiOkResponse({
-    type: CountResponse,
+    type: () => CountResponse,
     description: 'A sum of all categories in the system',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -97,7 +97,7 @@ export class TagController {
   }
 
   @ApiCreatedResponse({
-    type: EntityResponse<TagEntity>,
+    type: () => EntityResponse<TagEntity>,
     description: 'The tag was created successfully',
   })
   @ApiConflictResponse({
@@ -119,7 +119,7 @@ export class TagController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<TagEntity>,
+    type: () => EntityResponse<TagEntity>,
     description: 'The tag was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -139,7 +139,7 @@ export class TagController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<TagEntity>,
+    type: () => EntityResponse<TagEntity>,
     description: 'The tag was updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -159,7 +159,7 @@ export class TagController {
   }
 
   @ApiOkResponse({
-    type: DeleteResponse,
+    type: () => DeleteResponse,
     description: 'The tag was overwrite successfully',
   })
   @ApiUnauthorizedResponse({

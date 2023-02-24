@@ -3,6 +3,9 @@ module.exports = {
     port: 3000,
     hashPassword: 'something',
     jwtSecret: 'jwtSuperSecret',
+    cors: {
+      origin: '',
+    },
   },
   user: {
     takeMax: 200,

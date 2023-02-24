@@ -43,7 +43,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @ApiOkResponse({
-    type: CollectionResponse<CategoryEntity[]>,
+    type: () => CollectionResponse<CategoryEntity[]>,
     description: 'A list of categories',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -61,7 +61,7 @@ export class CategoryController {
   }
 
   @ApiFoundResponse({
-    type: EntityResponse<CategoryEntity>,
+    type: () => EntityResponse<CategoryEntity>,
     description: 'A found category',
   })
   @ApiNotFoundResponse({ description: 'Any category was found' })
@@ -81,7 +81,7 @@ export class CategoryController {
   }
 
   @ApiOkResponse({
-    type: CountResponse,
+    type: () => CountResponse,
     description: 'A sum of all categories in the system',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -96,7 +96,7 @@ export class CategoryController {
   }
 
   @ApiCreatedResponse({
-    type: EntityResponse<CategoryEntity>,
+    type: () => EntityResponse<CategoryEntity>,
     description: 'The category was created successfully',
   })
   @ApiConflictResponse({
@@ -118,7 +118,7 @@ export class CategoryController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<CategoryEntity>,
+    type: () => EntityResponse<CategoryEntity>,
     description: 'The category was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -141,7 +141,7 @@ export class CategoryController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<CategoryEntity>,
+    type: () => EntityResponse<CategoryEntity>,
     description: 'The category was updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -161,7 +161,7 @@ export class CategoryController {
   }
 
   @ApiOkResponse({
-    type: DeleteResponse,
+    type: () => DeleteResponse,
     description: 'The category was overwrite successfully',
   })
   @ApiUnauthorizedResponse({

@@ -23,7 +23,7 @@ export class CategoryEntity extends BaseEntity<
   @Column
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => [PostEntity] })
   @HasMany(() => PostEntity)
   posts: PostEntity[];
 }

@@ -48,7 +48,7 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @ApiOkResponse({
-    type: CollectionResponse<ProfileEntity[]>,
+    type: () => CollectionResponse<ProfileEntity[]>,
     description: 'A list of profiles',
   })
   @ApiUnauthorizedResponse({
@@ -69,7 +69,7 @@ export class ProfileController {
   }
 
   @ApiFoundResponse({
-    type: EntityResponse<ProfileEntity>,
+    type: () => EntityResponse<ProfileEntity>,
     description: 'A profile object that match with the provided id',
   })
   @ApiNotFoundResponse({ description: 'Profile not found' })
@@ -92,7 +92,7 @@ export class ProfileController {
   }
 
   @ApiOkResponse({
-    type: CountResponse,
+    type: () => CountResponse,
     description: 'A sum of profiles found in the system',
   })
   @ApiUnauthorizedResponse({
@@ -110,7 +110,7 @@ export class ProfileController {
   }
 
   @ApiCreatedResponse({
-    type: EntityResponse<ProfileEntity>,
+    type: () => EntityResponse<ProfileEntity>,
     description: 'A profile was created successfully',
   })
   @ApiConflictResponse({
@@ -132,7 +132,7 @@ export class ProfileController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<ProfileEntity>,
+    type: () => EntityResponse<ProfileEntity>,
     description: 'A profile was overwrite successfully',
   })
   @ApiUnauthorizedResponse({
@@ -150,7 +150,7 @@ export class ProfileController {
   }
 
   @ApiOkResponse({
-    type: EntityResponse<ProfileEntity>,
+    type: () => EntityResponse<ProfileEntity>,
     description: 'A profile was updated successfully',
   })
   @ApiUnauthorizedResponse({
@@ -168,7 +168,7 @@ export class ProfileController {
   }
 
   @ApiOkResponse({
-    type: DeleteResponse,
+    type: () => DeleteResponse,
     description: 'A profile was removed successfully',
   })
   @ApiUnauthorizedResponse({

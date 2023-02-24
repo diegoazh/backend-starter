@@ -25,7 +25,7 @@ export class TagEntity extends BaseEntity<
   @Column
   name: string;
 
-  @ApiProperty({ type: [PostSwaggerModel] })
+  @ApiProperty({ type: () => [PostSwaggerModel] })
   @BelongsToMany(() => PostEntity, () => PostTagEntity)
   posts: Array<PostEntity & { PostTagEntity: PostTagEntity }>;
 }

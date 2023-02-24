@@ -34,7 +34,7 @@ export class AuthController {
   ) {}
 
   @ApiCreatedResponse({
-    type: LoginResponse,
+    type: () => LoginResponse,
     description: 'Successfully login in the system',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -48,7 +48,7 @@ export class AuthController {
   }
 
   @ApiCreatedResponse({
-    type: EntityResponse<UserEntity>,
+    type: () => EntityResponse<UserEntity>,
     description: 'A user was created successfully',
   })
   @ApiConflictResponse({

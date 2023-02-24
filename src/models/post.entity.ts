@@ -80,11 +80,11 @@ export class PostEntity extends BaseEntity<
   @BelongsTo(() => CategoryEntity)
   category: CategoryEntity;
 
-  @ApiProperty({ type: [TagSwaggerModel] })
+  @ApiProperty({ type: () => [TagSwaggerModel] })
   @BelongsToMany(() => TagEntity, () => PostTagEntity)
   tags: Array<TagEntity & { PostTagEntity: PostTagEntity }>;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => [CommentEntity] })
   @HasMany(() => CommentEntity)
   comments: CommentEntity[];
 }

@@ -3,17 +3,20 @@ module.exports = {
     port: 'APP_PORT',
     hashPassword: 'HASH_PASSWORD',
     jwtSecret: 'JWT_SECRET',
+    cors: {
+      origin: 'APP_CORS_ORIGIN',
+    },
   },
   user: {
-    takeMax: 'USERS_TAKE_MAX'
+    takeMax: 'APP_USERS_TAKE_MAX',
   },
   profile: {
-    takeMax: 'PROFILE_TAKE_MAX'
+    takeMax: 'APP_PROFILE_TAKE_MAX',
   },
   post: {
-    takeMax: 'POSTS_TAKE_MAX'
+    takeMax: 'APP_POSTS_TAKE_MAX',
   },
   category: {
-    takeMax: 'CATEGORY_TAKE_MAX',
-  }
+    takeMax: 'APP_CATEGORY_TAKE_MAX',
+  },
 };
