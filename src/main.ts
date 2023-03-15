@@ -11,8 +11,6 @@ async function bootstrap(): Promise<void> {
   const configService = app.get(ConfigService);
   const logger = new Logger('Main');
 
-  // logger.debug(configService.get<string>('APP_CORS_ORIGIN'));
-
   app.enableCors({
     origin: JSON.parse(configService.get<string>('APP_CORS_ORIGIN')),
   });

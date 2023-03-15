@@ -1,15 +1,34 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { SequelizeModule } from '@nestjs/sequelize';
+import {
+  AuthGuard,
+  KeycloakConnectModule,
+  ResourceGuard,
+  RoleGuard,
+} from 'nest-keycloak-connect';
 import dbConfig from '../config/db.config';
-import { AuthModule } from './auth/auth.module';
+import { KeycloakModule } from './keycloak/keycloak.module';
 import * as models from './models';
 import { PostsModule } from './post/posts.module';
+import { KeycloakConfigService } from './shared/services';
 import { SharedModule } from './shared/shared.module';
 import { UsersModule } from './user/users.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      expandVariables: true,
+      envFilePath: `./environments/.env.${
+        process.env.NODE_ENV || 'development'
+      }`,
+    }),
+    KeycloakConnectModule.registerAsync({
+      useExisting: KeycloakConfigService,
+      imports: [SharedModule],
+    }),
     SequelizeModule.forRoot({
       ...dbConfig,
       models: Object.values(models).filter(
@@ -18,17 +37,24 @@ import { UsersModule } from './user/users.module';
       autoLoadModels: true,
       synchronize: true,
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      expandVariables: true,
-      envFilePath: `./environments/.env.${
-        process.env.NODE_ENV || 'development'
-      }`,
-    }),
     SharedModule,
     UsersModule,
     PostsModule,
-    AuthModule,
+    KeycloakModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ResourceGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
   ],
 })
 export class AppModule {}
