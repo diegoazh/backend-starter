@@ -7,6 +7,18 @@ module.exports = {
       origin: 'APP_CORS_ORIGIN',
     },
   },
+  keycloak: {
+    authServerUrl: 'KEYCLOAK_AUTH_SERVER_URL',
+    realm: 'KEYCLOAK_REALM',
+    clientId: 'KEYCLOAK_CLIENT_ID',
+    clientSecret: 'KEYCLOAK_CLIENT_SECRET',
+    scope: 'KEYCLOAK_SCOPE',
+    responseType: 'KEYCLOAK_RESPONSE_TYPE',
+    loginUrl: 'KEYCLOAK_AUTH_URL',
+    tokenUrl: 'KEYCLOAK_TOKEN_URL',
+    logoutUrl: 'KEYCLOAK_LOGOUT_URL',
+    redirectUrl: 'KEYCLOAK_REDIRECT_URL',
+  },
   user: {
     takeMax: 'APP_USERS_TAKE_MAX',
   },

@@ -7,6 +7,18 @@ module.exports = {
       origin: '',
     },
   },
+  keycloak: {
+    authServerUrl: '',
+    realm: '',
+    clientId: '',
+    clientSecret: '',
+    scope: '',
+    responseType: '',
+    loginUrl: '',
+    tokenUrl: '',
+    logoutUrl: '',
+    redirectUrl: '',
+  },
   user: {
     takeMax: 200,
   },
