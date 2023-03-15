@@ -1,16 +1,38 @@
 version: "3.8"
 services:
 
+  keycloak:
+    image: starter-keycloak
+    container_name: starter_keycloak
+    restart: always
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://${BACKEND_POSTGRESQL_HOST}:5432/${KEYCLOAK_POSTGRESQL_DB}
+      - KC_DB_USERNAME=${BACKEND_POSTGRESQL_USER}
+      - KC_DB_PASSWORD=${BACKEND_POSTGRESQL_ROOT_PASSWORD}
+      - KC_HOSTNAME=localhost
+    build:
+      context: ./keycloak
+    command: start-dev
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
   database:
     image: postgres:latest
     container_name: starter_postgresql
     restart: always
     environment:
-      - POSTGRES_PASSWORD=${BACKEND_POSTGRESQL_ROOT_PASSWORD}
-      - POSTGRES_DB=${BACKEND_POSTGRESQL_DB}
+      - POSTGRES_MULTIPLE_DATABASES=${BACKEND_POSTGRESQL_DB},${KEYCLOAK_POSTGRESQL_DB}
+      # - POSTGRES_DB=${BACKEND_POSTGRESQL_DB}
       - POSTGRES_USER=${BACKEND_POSTGRESQL_USER}
+      - POSTGRES_PASSWORD=${BACKEND_POSTGRESQL_ROOT_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./database/initdb:/docker-entrypoint-initdb.d
+      - ./database/db-data:/var/lib/postgresql/data
     networks:
       - backend
     ports:
@@ -24,65 +46,65 @@ services:
     volumes:
       - .:/${BACKEND_WORKING_DIR}
       - /${BACKEND_WORKING_DIR}/node_modules
-    ports:
-      - "3000:3000"
-      - "9229:9229"
-    networks:
-      - backend
     environment:
       - START_TYPE
       - NODE_ENV
       - BACKEND_WORKING_DIR
     build:
-      context: ./packages/backend
-    command: yarn run start:${START_TYPE}
+      context: .
+    command: pnpm run start:${START_TYPE}
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    networks:
+      - backend
 
 networks:
   backend:
-  # admin:
-  # frontend:
+    # admin:
+    # frontend:
 
 volumes:
   pgdata:
 
-  # admin:
-  #   image: starter-vue-admin
-  #   container_name: starter_vue_admin
-  #   restart: always
-  #   working_dir: /${ADMIN_WORKING_DIR}
-  #   volumes:
-  #     - ./packages/admin:/${ADMIN_WORKING_DIR}
-  #     - /${ADMIN_WORKING_DIR}/node_modules
-  #   ports:
-  #     - "8080:8080"
-  #     - "9230:9229"
-  #   networks:
-  #     - admin
-  #   environment:
-  #     - START_TYPE
-  #     - NODE_ENV
-  #     - ADMIN_WORKING_DIR
-  #   build:
-  #     context: ./packages/admin
-  #   command: yarn run dev
+    # admin:
+    #   image: starter-vue-admin
+    #   container_name: starter_vue_admin
+    #   restart: always
+    #   working_dir: /${ADMIN_WORKING_DIR}
+    #   volumes:
+    #     - ./packages/admin:/${ADMIN_WORKING_DIR}
+    #     - /${ADMIN_WORKING_DIR}/node_modules
+    #   ports:
+    #     - "8080:8080"
+    #     - "9230:9229"
+    #   networks:
+    #     - admin
+    #   environment:
+    #     - START_TYPE
+    #     - NODE_ENV
+    #     - ADMIN_WORKING_DIR
+    #   build:
+    #     context: ./packages/admin
+    #   command: yarn run dev
 
-  # frontend:
-  #   image: starter-vue-frontend
-  #   container_name: starter_vue_frontend
-  #   restart: always
-  #   working_dir: /${FRONTEND_WORKING_DIR}
-  #   volumes:
-  #     - ./packages/frontend:/${FRONTEND_WORKING_DIR}
-  #     - /${FRONTEND_WORKING_DIR}/node_modules
-  #   ports:
-  #     - "9090:8080"
-  #     - "9231:9229"
-  #   networks:
-  #     - frontend
-  #   environment:
-  #     - START_TYPE
-  #     - NODE_ENV
-  #     - FRONTEND_WORKING_DIR
-  #   build:
-  #     context: ./packages/frontend
-  #   command: yarn run serve
+    # frontend:
+    #   image: starter-vue-frontend
+    #   container_name: starter_vue_frontend
+    #   restart: always
+    #   working_dir: /${FRONTEND_WORKING_DIR}
+    #   volumes:
+    #     - ./packages/frontend:/${FRONTEND_WORKING_DIR}
+    #     - /${FRONTEND_WORKING_DIR}/node_modules
+    #   ports:
+    #     - "9090:8080"
+    #     - "9231:9229"
+    #   networks:
+    #     - frontend
+    #   environment:
+    #     - START_TYPE
+    #     - NODE_ENV
+    #     - FRONTEND_WORKING_DIR
+    #   build:
+    #     context: ./packages/frontend
+    #   command: yarn run serve
