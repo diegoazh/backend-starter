@@ -11,7 +11,7 @@ import {
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes, UserEntity } from '.';
 import { PostType } from '../post/constants/post.constant';
-import { TagSwaggerModel } from '../shared/utils/swagger-models';
+import { TagExtendedModel } from '../shared/utils';
 import { CategoryEntity } from './category.entity';
 import { CommentEntity } from './comment.entity';
 import { PostTagEntity } from './post-tag.entity';
@@ -80,7 +80,7 @@ export class PostEntity extends BaseEntity<
   @BelongsTo(() => CategoryEntity)
   category: CategoryEntity;
 
-  @ApiProperty({ type: () => [TagSwaggerModel] })
+  @ApiProperty({ type: () => [TagExtendedModel] })
   @BelongsToMany(() => TagEntity, () => PostTagEntity)
   tags: Array<TagEntity & { PostTagEntity: PostTagEntity }>;
 

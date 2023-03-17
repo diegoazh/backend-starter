@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BelongsToMany, Column, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
-import { PostSwaggerModel } from '../shared/utils/swagger-models';
+import { PostExtendedModel } from '../shared/utils';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { PostTagEntity } from './post-tag.entity';
 import { PostEntity } from './post.entity';
@@ -25,7 +25,9 @@ export class TagEntity extends BaseEntity<
   @Column
   name: string;
 
-  @ApiProperty({ type: () => [PostSwaggerModel] })
+  @ApiProperty({
+    type: () => [PostExtendedModel],
+  })
   @BelongsToMany(() => PostEntity, () => PostTagEntity)
   posts: Array<PostEntity & { PostTagEntity: PostTagEntity }>;
 }
