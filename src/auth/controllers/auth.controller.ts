@@ -15,7 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from '../../models';
-import { EntityResponse, LoginResponse } from '../../shared/responses';
+import { AppPaginatedResponse, LoginResponse } from '../../shared/responses';
 import { CreateUserDto } from '../../user/dto';
 import { UserService } from '../../user/services/user.service';
 import { CredentialsDto } from '../dto/credentials.dto';
@@ -48,7 +48,7 @@ export class AuthController {
   }
 
   @ApiCreatedResponse({
-    type: () => EntityResponse<UserEntity>,
+    type: () => AppPaginatedResponse<UserEntity>,
     description: 'A user was created successfully',
   })
   @ApiConflictResponse({
@@ -59,9 +59,9 @@ export class AuthController {
   @Post('register')
   async create(
     @Body() user: CreateUserDto,
-  ): Promise<EntityResponse<UserEntity>> {
+  ): Promise<AppPaginatedResponse<UserEntity>> {
     const newUser = await this.userService.create(user);
 
-    return { data: { item: newUser.toJSON() } };
+    return { data: newUser.toJSON() };
   }
 }

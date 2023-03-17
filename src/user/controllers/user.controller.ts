@@ -10,40 +10,43 @@ import {
   Patch,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiFoundResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards';
 import { UserEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
-import {
-  CollectionResponse,
-  CountResponse,
-  DeleteResponse,
-  EntityResponse,
-} from '../../shared/responses';
+import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { PatchUserDto } from '../dto/patch-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserService } from '../services/user.service';
 
 @ApiTags('Users controller')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOkResponse({
-    type: () => CollectionResponse<UserEntity[]>,
     description: 'A list of found users',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppPaginatedResponse) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(UserEntity) },
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
@@ -52,15 +55,19 @@ export class UserController {
   @Get()
   async find(
     @Query() query?: IAppQueryString,
-  ): Promise<CollectionResponse<UserEntity[]>> {
+  ): Promise<AppPaginatedResponse<UserEntity[]>> {
     const users = await this.userService.find(query);
 
-    return { data: { items: users.map((user) => user.toJSON()) } };
+    return { data: users.map((user) => user.toJSON()) };
   }
 
   @ApiFoundResponse({
-    type: () => EntityResponse<UserEntity>,
     description: 'A user object that match with the provided id',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(UserEntity) },
+      },
+    },
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({
@@ -69,19 +76,25 @@ export class UserController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
   @Get(':id')
-  async findById(@Param('id') id: string): Promise<EntityResponse<UserEntity>> {
+  async findById(@Param('id') id: string): Promise<AppResponse<UserEntity>> {
     const user = await this.userService.findById(id);
 
     if (!user) {
       throw new NotFoundException('user_exception_not_found');
     }
 
-    return { data: { item: user.toJSON() } };
+    return { data: user.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => CountResponse,
     description: 'The sum of all users in the system',
+    schema: {
+      properties: {
+        data: {
+          type: 'integer',
+        },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
@@ -91,15 +104,19 @@ export class UserController {
   async count(
     @Query()
     query?: IAppQueryString,
-  ): Promise<CountResponse> {
+  ): Promise<AppPaginatedResponse<number>> {
     const { count } = await this.userService.count(query);
 
-    return { data: { count } };
+    return { data: count };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<UserEntity>,
     description: 'The user was overwrite successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(UserEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
@@ -109,15 +126,19 @@ export class UserController {
   async overwrite(
     @Param('id') id: string,
     @Body() user: UpdateUserDto,
-  ): Promise<EntityResponse<UserEntity>> {
+  ): Promise<AppResponse<UserEntity>> {
     const updatedUser = await this.userService.overwrite(id, user);
 
-    return { data: { item: updatedUser.toJSON() } };
+    return { data: updatedUser.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<UserEntity>,
     description: 'The properties of the user were updated successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(UserEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
@@ -127,24 +148,28 @@ export class UserController {
   async update(
     @Param('id') id: string,
     user: PatchUserDto,
-  ): Promise<EntityResponse<UserEntity>> {
+  ): Promise<AppResponse<UserEntity>> {
     const updatedUser = await this.userService.update(id, user);
 
-    return { data: { item: updatedUser.toJSON() } };
+    return { data: updatedUser.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => DeleteResponse,
     description: 'The user was deleted successfully',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<DeleteResponse> {
+  async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.userService.remove(id);
 
-    return { data: { deleted } };
+    return { data: deleted };
   }
 }

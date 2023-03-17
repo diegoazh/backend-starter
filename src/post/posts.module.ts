@@ -14,7 +14,7 @@ import { TagService } from './services/tag.service';
     SequelizeModule.forFeature([PostEntity, CategoryEntity, TagEntity]),
     SharedModule,
   ],
-  controllers: [PostController, CategoryController, TagController],
+  controllers: [TagController, CategoryController, PostController],
   providers: [PostService, CategoryService, TagService],
 })
 export class PostsModule {}

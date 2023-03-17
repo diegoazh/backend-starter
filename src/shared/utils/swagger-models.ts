@@ -1,40 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IPostAttributes,
-  IPostTagAttributes,
-  ITagAttributes,
-} from '../../models';
+import { IPostAttributes, ITagAttributes, PostTagEntity } from '../../models';
 import { PostType } from '../../post/constants/post.constant';
 
-class PostTagSwaggerModel implements IPostTagAttributes {
-  @ApiProperty()
-  postId: string;
-
-  @ApiProperty()
-  tagId: string;
-
-  @ApiProperty()
-  id: string;
-
-  @ApiProperty()
-  createdAt: Date;
-
-  @ApiProperty()
-  updatedAt: Date;
-
-  @ApiProperty()
-  deletedAt: Date;
-}
-
-export class TagSwaggerModel implements ITagAttributes {
+export class TagExtendedModel implements ITagAttributes {
   @ApiProperty()
   name: string;
 
   @ApiProperty()
   id: string;
 
-  @ApiProperty({ type: () => PostTagSwaggerModel })
-  PostTagEntity: PostTagSwaggerModel;
+  @ApiProperty({ type: () => PostTagEntity })
+  PostTagEntity: PostTagEntity;
 
   @ApiProperty()
   createdAt: Date;
@@ -46,7 +22,7 @@ export class TagSwaggerModel implements ITagAttributes {
   deletedAt: Date;
 }
 
-export class PostSwaggerModel implements IPostAttributes {
+export class PostExtendedModel implements IPostAttributes {
   @ApiProperty()
   title: string;
 
@@ -74,8 +50,8 @@ export class PostSwaggerModel implements IPostAttributes {
   @ApiProperty()
   id: string;
 
-  @ApiProperty({ type: () => PostTagSwaggerModel })
-  PostTagEntity: PostTagSwaggerModel;
+  @ApiProperty({ type: () => PostTagEntity })
+  PostTagEntity: PostTagEntity;
 
   @ApiProperty()
   createdAt: Date;

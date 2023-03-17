@@ -11,10 +11,8 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiFoundResponse,
@@ -23,16 +21,11 @@ import {
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards';
 import { CategoryEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
-import {
-  CollectionResponse,
-  CountResponse,
-  DeleteResponse,
-  EntityResponse,
-} from '../../shared/responses';
+import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
 import { CategoryService } from '../services/category.service';
@@ -43,26 +36,40 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @ApiOkResponse({
-    type: () => CollectionResponse<CategoryEntity[]>,
     description: 'A list of categories',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppPaginatedResponse) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(CategoryEntity) },
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get()
   public async find(
     @Query() query?: IAppQueryString,
-  ): Promise<CollectionResponse<CategoryEntity[]>> {
+  ): Promise<AppPaginatedResponse<CategoryEntity[]>> {
     const categories = await this.categoryService.find(query);
 
     return {
-      data: {
-        items: categories.map((category) => category.toJSON()),
-      },
+      data: categories.map((category) => category.toJSON()),
     };
   }
 
   @ApiFoundResponse({
-    type: () => EntityResponse<CategoryEntity>,
     description: 'A found category',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(CategoryEntity) },
+      },
+    },
   })
   @ApiNotFoundResponse({ description: 'Any category was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -70,34 +77,42 @@ export class CategoryController {
   @Get(':id')
   public async findById(
     @Param('id') id: string,
-  ): Promise<EntityResponse<CategoryEntity>> {
+  ): Promise<AppResponse<CategoryEntity>> {
     const category = await this.categoryService.findById(id);
 
     if (!category) {
       throw new NotFoundException('category_exception_not_found');
     }
 
-    return { data: { item: category.toJSON() } };
+    return { data: category.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => CountResponse,
     description: 'A sum of all categories in the system',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get('count')
   async count(
     @Query()
     query?: IAppQueryString,
-  ): Promise<CountResponse> {
+  ): Promise<AppResponse<number>> {
     const { count } = await this.categoryService.count(query);
 
-    return { data: { count } };
+    return { data: count };
   }
 
   @ApiCreatedResponse({
-    type: () => EntityResponse<CategoryEntity>,
     description: 'The category was created successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(CategoryEntity) },
+      },
+    },
   })
   @ApiConflictResponse({
     description: 'A previous category was found with the same main constraints',
@@ -106,74 +121,78 @@ export class CategoryController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Post()
   public async create(
     @Body() categoryData: CreateCategoryDto,
-  ): Promise<EntityResponse<CategoryEntity>> {
+  ): Promise<AppResponse<CategoryEntity>> {
     const newCategory = await this.categoryService.create(categoryData);
 
-    return { data: { item: newCategory.toJSON() } };
+    return { data: newCategory.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<CategoryEntity>,
     description: 'The category was overwrite successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(CategoryEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Put(':id')
   public async overwrite(
     @Param('id') id: string,
     @Body() categoryData: CreateCategoryDto,
-  ): Promise<EntityResponse<CategoryEntity>> {
+  ): Promise<AppResponse<CategoryEntity>> {
     const updatedCategory = await this.categoryService.overwrite(
       id,
       categoryData,
     );
 
-    return { data: { item: updatedCategory.toJSON() } };
+    return { data: updatedCategory.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<CategoryEntity>,
     description: 'The category was updated successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(CategoryEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
     categoryData: PatchCategoryDto,
-  ): Promise<EntityResponse<CategoryEntity>> {
+  ): Promise<AppResponse<CategoryEntity>> {
     const updateCategory = await this.categoryService.update(id, categoryData);
 
-    return { data: { item: updateCategory.toJSON() } };
+    return { data: updateCategory.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => DeleteResponse,
     description: 'The category was overwrite successfully',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<DeleteResponse> {
+  async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.categoryService.remove(id);
 
-    return { data: { deleted } };
+    return { data: deleted };
   }
 }

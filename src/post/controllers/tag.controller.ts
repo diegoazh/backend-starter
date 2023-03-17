@@ -11,10 +11,8 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiFoundResponse,
@@ -23,16 +21,11 @@ import {
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards';
 import { TagEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
-import {
-  CollectionResponse,
-  CountResponse,
-  DeleteResponse,
-  EntityResponse,
-} from '../../shared/responses';
+import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchTagDto } from '../dto/patch-tag.dto';
 import { UpdateTagDto } from '../dto/update-tag.dto';
@@ -44,26 +37,40 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @ApiOkResponse({
-    type: () => CollectionResponse<TagEntity[]>,
     description: 'A list of tags',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppPaginatedResponse) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(TagEntity) },
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get()
   public async find(
     @Query() query?: IAppQueryString,
-  ): Promise<CollectionResponse<TagEntity[]>> {
+  ): Promise<AppPaginatedResponse<TagEntity[]>> {
     const tags = await this.tagService.find(query);
 
     return {
-      data: {
-        items: tags.map((tag) => tag.toJSON()),
-      },
+      data: tags.map((tag) => tag.toJSON()),
     };
   }
 
   @ApiFoundResponse({
-    type: () => EntityResponse<TagEntity>,
     description: 'A found tag',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(TagEntity) },
+      },
+    },
   })
   @ApiNotFoundResponse({ description: 'Any tag was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
@@ -71,34 +78,42 @@ export class TagController {
   @Get(':id')
   public async findById(
     @Param('id') id: string,
-  ): Promise<EntityResponse<TagEntity>> {
+  ): Promise<AppResponse<TagEntity>> {
     const tag = await this.tagService.findById(id);
 
     if (!tag) {
       throw new NotFoundException('tag_exception_not_found');
     }
 
-    return { data: { item: tag.toJSON() } };
+    return { data: tag.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => CountResponse,
     description: 'A sum of all categories in the system',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get('count')
   async count(
     @Query()
     query?: IAppQueryString,
-  ): Promise<CountResponse> {
+  ): Promise<AppResponse<number>> {
     const { count } = await this.tagService.count(query);
 
-    return { data: { count } };
+    return { data: count };
   }
 
   @ApiCreatedResponse({
-    type: () => EntityResponse<TagEntity>,
     description: 'The tag was created successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(TagEntity) },
+      },
+    },
   })
   @ApiConflictResponse({
     description: 'A previous tag was found with the same main constraints',
@@ -107,71 +122,75 @@ export class TagController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Post()
   public async create(
     @Body() tagData: CreateTagDto,
-  ): Promise<EntityResponse<TagEntity>> {
+  ): Promise<AppResponse<TagEntity>> {
     const newTag = await this.tagService.create(tagData);
 
-    return { data: { item: newTag.toJSON() } };
+    return { data: newTag.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<TagEntity>,
     description: 'The tag was overwrite successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(TagEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Put(':id')
   public async overwrite(
     @Param('id') id: string,
     @Body() tagData: UpdateTagDto,
-  ): Promise<EntityResponse<TagEntity>> {
+  ): Promise<AppResponse<TagEntity>> {
     const updatedTag = await this.tagService.overwrite(id, tagData);
 
-    return { data: { item: updatedTag.toJSON() } };
+    return { data: updatedTag.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<TagEntity>,
     description: 'The tag was updated successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(TagEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
     tagData: PatchTagDto,
-  ): Promise<EntityResponse<TagEntity>> {
+  ): Promise<AppResponse<TagEntity>> {
     const updateCategory = await this.tagService.update(id, tagData);
 
-    return { data: { item: updateCategory.toJSON() } };
+    return { data: updateCategory.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => DeleteResponse,
     description: 'The tag was overwrite successfully',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<DeleteResponse> {
+  async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.tagService.remove(id);
 
-    return { data: { deleted } };
+    return { data: deleted };
   }
 }

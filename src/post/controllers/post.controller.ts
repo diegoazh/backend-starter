@@ -12,10 +12,8 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiFoundResponse,
@@ -24,17 +22,12 @@ import {
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards';
 import { AuthenticatedRequest } from '../../auth/types/authenticated-request.type';
 import { PostEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
-import {
-  CollectionResponse,
-  CountResponse,
-  DeleteResponse,
-  EntityResponse,
-} from '../../shared/responses';
+import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -46,57 +39,81 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @ApiOkResponse({
-    type: () => CollectionResponse<PostEntity[]>,
     description: 'A list of posts',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(AppPaginatedResponse) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(PostEntity) },
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get()
   async find(
     @Query() query?: IAppQueryString,
-  ): Promise<CollectionResponse<PostEntity[]>> {
+  ): Promise<AppPaginatedResponse<PostEntity[]>> {
     const posts = await this.postService.find(query);
 
     return {
-      data: { items: posts.map((post) => post.toJSON()) },
+      data: posts.map((post) => post.toJSON()),
     };
   }
 
   @ApiFoundResponse({
-    type: () => EntityResponse<PostEntity>,
     description: 'A found post',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(PostEntity) },
+      },
+    },
   })
   @ApiNotFoundResponse({ description: 'Any post was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
   @Get(':id')
-  async findById(@Param('id') id: string): Promise<EntityResponse<PostEntity>> {
+  async findById(@Param('id') id: string): Promise<AppResponse<PostEntity>> {
     const post = await this.postService.findById(id);
 
     if (!post) {
       throw new NotFoundException('post_exception_not_found');
     }
 
-    return { data: { item: post.toJSON() } };
+    return { data: post.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => CountResponse,
     description: 'A sum of all posts in the system',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get('count')
   async count(
     @Query()
     query?: IAppQueryString,
-  ): Promise<CountResponse> {
+  ): Promise<AppResponse<number>> {
     const { count } = await this.postService.count(query);
 
-    return { data: { count } };
+    return { data: count };
   }
 
   @ApiCreatedResponse({
-    type: () => EntityResponse<PostEntity>,
     description: 'The post was created successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(PostEntity) },
+      },
+    },
   })
   @ApiConflictResponse({
     description: 'A previous post was found with the same main constraints',
@@ -105,72 +122,76 @@ export class PostController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Body() postData: CreatePostDto,
     @Req() req: AuthenticatedRequest,
-  ): Promise<EntityResponse<PostEntity>> {
+  ): Promise<AppResponse<PostEntity>> {
     const newPost = await this.postService.create(postData, req.user);
 
-    return { data: { item: newPost.toJSON() } };
+    return { data: newPost.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<PostEntity>,
     description: 'The post was overwrite successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(PostEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async overwrite(
     @Param('id') id: string,
     @Body() postData: UpdatePostDto,
-  ): Promise<EntityResponse<PostEntity>> {
+  ): Promise<AppResponse<PostEntity>> {
     const updatedPost = await this.postService.overwrite(id, postData);
 
-    return { data: { item: updatedPost.toJSON() } };
+    return { data: updatedPost.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => EntityResponse<PostEntity>,
     description: 'The post was updated successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(PostEntity) },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
     postData: PatchPostDto,
-  ): Promise<EntityResponse<PostEntity>> {
+  ): Promise<AppResponse<PostEntity>> {
     const updatedPost = await this.postService.update(id, postData);
 
-    return { data: { item: updatedPost.toJSON() } };
+    return { data: updatedPost.toJSON() };
   }
 
   @ApiOkResponse({
-    type: () => DeleteResponse,
     description: 'The post was overwrite successfully',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<DeleteResponse> {
+  async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.postService.remove(id);
 
-    return { data: { deleted } };
+    return { data: deleted };
   }
 }
