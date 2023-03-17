@@ -1,10 +1,15 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerDocumentOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import helmet from 'helmet';
 import { version } from '../package.json';
 import { AppModule } from './app.module';
+import { TagEntity } from './models';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -19,14 +24,17 @@ async function bootstrap(): Promise<void> {
   app.useGlobalPipes(new ValidationPipe());
 
   if (process.env.NODE_ENV !== 'production') {
-    const options = new DocumentBuilder()
+    const config = new DocumentBuilder()
       .setTitle('NestJs backend starter')
       .setDescription('Backend starter API for simple web apps or blogs')
       .setVersion(version)
       .addTag('Resources')
       .addBearerAuth()
       .build();
-    const document = SwaggerModule.createDocument(app, options);
+    const options: SwaggerDocumentOptions = {
+      extraModels: [TagEntity],
+    };
+    const document = SwaggerModule.createDocument(app, config, options);
     SwaggerModule.setup('api', app, document);
   }
 
