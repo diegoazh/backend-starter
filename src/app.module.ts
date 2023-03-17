@@ -38,9 +38,9 @@ import { UsersModule } from './user/users.module';
       synchronize: true,
     }),
     SharedModule,
+    KeycloakModule,
     UsersModule,
     PostsModule,
-    KeycloakModule,
   ],
   providers: [
     {
