@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import qs from 'qs';
-import { request } from 'undici';
+import { Agent, request, setGlobalDispatcher } from 'undici';
 import { IAccessToken } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services';
 
@@ -59,8 +59,19 @@ export class AuthService {
       code,
     });
 
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      setGlobalDispatcher(
+        new Agent({
+          connect: {
+            rejectUnauthorized: false,
+          },
+        }),
+      );
+    }
+
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
+      'X-Apikey': this.nodeConfig.config.get<string>('gateway.apiKey'),
     };
 
     const { body } = await request(this.tokenUrl, {
