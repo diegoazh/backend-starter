@@ -1,4 +1,7 @@
 module.exports = {
+  gateway: {
+    apiKey: '',
+  },
   app: {
     port: 3000,
     hashPassword: 'something',

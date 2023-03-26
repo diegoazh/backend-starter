@@ -1,4 +1,7 @@
 module.exports = {
+  gateway: {
+    apiKey: 'GATEWAY_API_KEY',
+  },
   app: {
     port: 'APP_PORT',
     hashPassword: 'HASH_PASSWORD',
@@ -8,7 +11,7 @@ module.exports = {
     },
   },
   keycloak: {
-    authServerUrl: 'KEYCLOAK_AUTH_SERVER_URL',
+    authServerUrl: 'KEYCLOAK_SERVER_URL',
     realm: 'KEYCLOAK_REALM',
     clientId: 'KEYCLOAK_CLIENT_ID',
     clientSecret: 'KEYCLOAK_CLIENT_SECRET',
