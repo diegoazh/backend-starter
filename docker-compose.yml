@@ -1,29 +1,32 @@
 version: "3.8"
 services:
 
-  keycloak:
-    image: starter-keycloak
-    container_name: starter_keycloak
+  gateway:
+    image: starter_gateway
+    container_name: starter-gateway
     restart: always
-    environment:
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://${BACKEND_POSTGRESQL_HOST}:5432/${KEYCLOAK_POSTGRESQL_DB}
-      - KC_DB_USERNAME=${BACKEND_POSTGRESQL_USER}
-      - KC_DB_PASSWORD=${BACKEND_POSTGRESQL_ROOT_PASSWORD}
-      - KC_HOSTNAME=localhost
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/api_gateway.conf:/etc/nginx/api_gateway.conf
+      - ./docker/nginx/api_json_errors.conf:/etc/nginx/api_json_errors.conf
+      - ./docker/nginx/api_keys.conf:/etc/nginx/api_keys.conf
+      - ./docker/nginx/api_conf.d:/etc/nginx/api_conf.d
+      - ./docker/nginx/certificates/starter.io.crt:/etc/ssl/certs/starter.io.crt
+      - ./docker/nginx/certificates/starter.io.key:/etc/ssl/certs/starter.io.key
     build:
-      context: ./keycloak
-    command: start-dev
-    ports:
-      - "8080:8080"
+      context: ./docker/nginx
     networks:
+      - starter-net
+    ports:
+      - "443:443"
+    depends_on:
+      - database
+      - keycloak
       - backend
 
   database:
     image: postgres:latest
-    container_name: starter_postgresql
+    container_name: starter-postgresql
     restart: always
     environment:
       - POSTGRES_MULTIPLE_DATABASES=${BACKEND_POSTGRESQL_DB},${KEYCLOAK_POSTGRESQL_DB}
@@ -33,14 +36,42 @@ services:
     volumes:
       - ./database/initdb:/docker-entrypoint-initdb.d
       - ./database/db-data:/var/lib/postgresql/data
-    networks:
-      - backend
     ports:
       - "5432:5432"
+    networks:
+      - starter-net
+
+  keycloak:
+    image: starter_keycloak
+    container_name: starter-keycloak
+    restart: always
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://${BACKEND_POSTGRESQL_HOST}:5432/${KEYCLOAK_POSTGRESQL_DB}
+      - KC_DB_USERNAME=${BACKEND_POSTGRESQL_USER}
+      - KC_DB_PASSWORD=${BACKEND_POSTGRESQL_ROOT_PASSWORD}
+      - KC_HOSTNAME=auth.starter.io
+      # - KC_HOSTNAME_PORT=8080
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=true
+      - KC_HOSTNAME_STRICT_BACKCHANNEL=false
+      - KC_HTTP_PORT=8080
+      - KC_PROXY=edge
+    build:
+      context: ./docker/keycloak
+    command: start-dev
+    # ports:
+    #   - "8080:8080"
+    networks:
+      - starter-net
+    depends_on:
+      - database
 
   backend:
-    image: starter-nestjs
-    container_name: starter_nestjs
+    image: starter_nestjs
+    container_name: starter-nestjs
     restart: always
     working_dir: /${BACKEND_WORKING_DIR}
     volumes:
@@ -50,17 +81,22 @@ services:
       - START_TYPE
       - NODE_ENV
       - BACKEND_WORKING_DIR
+    extra_hosts:
+      - "auth.starter.io:172.19.0.3"
     build:
       context: .
     command: pnpm run start:${START_TYPE}
     ports:
-      - "3000:3000"
+      # - "3000:3000"
       - "9229:9229"
     networks:
-      - backend
+      - starter-net
+    depends_on:
+      - database
+      - keycloak
 
 networks:
-  backend:
+  starter-net:
     # admin:
     # frontend:
 
