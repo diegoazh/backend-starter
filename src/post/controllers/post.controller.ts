@@ -14,9 +14,11 @@ import {
   Req,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiFoundResponse,
+  ApiHeader,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -24,6 +26,7 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { Resource, Scopes } from 'nest-keycloak-connect';
 import { AuthenticatedRequest } from '../../auth/types/authenticated-request.type';
 import { PostEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
@@ -34,6 +37,13 @@ import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostService } from '../services/post.service';
 
 @ApiTags('Posts controller')
+@ApiHeader({
+  name: 'X-Apikey',
+  description: 'Valid api key to contact service behind gateway',
+  example: 'abcdefghijklmnopqrstuvwxyz',
+})
+@ApiBearerAuth()
+@Resource('post')
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -55,6 +65,8 @@ export class PostController {
     },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  // @Roles({ roles: ['admin'] })
+  @Scopes('read')
   @Get()
   async find(
     @Query() query?: IAppQueryString,
