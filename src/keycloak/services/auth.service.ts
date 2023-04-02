@@ -71,7 +71,6 @@ export class AuthService {
 
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'X-Apikey': this.nodeConfig.config.get<string>('gateway.apiKey'),
     };
 
     const { body } = await request(this.tokenUrl, {

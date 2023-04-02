@@ -16,7 +16,11 @@ services:
     build:
       context: ./docker/nginx
     networks:
-      - starter-net
+      'starter-net':
+        aliases:
+          - "auth.starter.io"
+          - "app.starter.io"
+          - "starter.io"
     ports:
       - "443:443"
     depends_on:
@@ -81,8 +85,6 @@ services:
       - START_TYPE
       - NODE_ENV
       - BACKEND_WORKING_DIR
-    extra_hosts:
-      - "auth.starter.io:172.19.0.3"
     build:
       context: .
     command: pnpm run start:${START_TYPE}

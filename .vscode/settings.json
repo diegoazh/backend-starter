@@ -4,9 +4,7 @@
   "editor.tabSize": 2,
   "editor.trimAutoWhitespace": true,
   "editor.formatOnSave": true,
-  "eslint.workingDirectories": [
-    { "pattern": ".", "changeProcessCWD": true }
-  ],
+  "eslint.workingDirectories": [{ "pattern": ".", "changeProcessCWD": true }],
   "files.exclude": {
     "**/.DS_Store": true,
     "**/.git": true,
@@ -33,5 +31,6 @@
   "jest.pathToJest": "./node_modules/.bin/jest",
   "jest.pathToConfig": "./jest.config.js",
   "jest.disabledWorkspaceFolders": ["."],
-  "prettier.singleQuote": true
+  "prettier.singleQuote": true,
+  "cSpell.words": ["Apikey", "keycloak", "nestjs"]
 }
