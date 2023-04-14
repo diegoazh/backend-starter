@@ -3,6 +3,11 @@
 /node_modules
 /.pnpm-store
 /database/db-data
+/docker/nginx/certificates/own-ca/*
+!/docker/nginx/certificates/own-ca/.generate-certificates
+/docker/nginx/certificates/self-signed/*
+!/docker/nginx/certificates/self-signed/cert.conf
+!/docker/nginx/certificates/self-signed/.generate-certificates
 
 # Logs
 logs

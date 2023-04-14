@@ -9,17 +9,19 @@ import {
 import helmet from 'helmet';
 import { version } from '../package.json';
 import { AppModule } from './app.module';
-import { TagEntity, UserEntity } from './models';
+import { TagEntity } from './models';
 import { AppPaginatedResponse, AppResponse } from './shared/responses';
+import { LoggedUserEntity } from './user/models';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const logger = new Logger('Main');
 
-  app.enableCors({
-    origin: JSON.parse(configService.get<string>('APP_CORS_ORIGIN')),
-  });
+  // If the cores configuration is managed by the nginx reverse proxy this must be disabled if not you must enabled
+  // app.enableCors({
+  //   origin: JSON.parse(configService.get<string>('APP_CORS_ORIGIN')),
+  // });
 
   app.use(helmet());
   app.useGlobalPipes(new ValidationPipe());
@@ -33,7 +35,12 @@ async function bootstrap(): Promise<void> {
       .addBearerAuth()
       .build();
     const options: SwaggerDocumentOptions = {
-      extraModels: [TagEntity, UserEntity, AppPaginatedResponse, AppResponse],
+      extraModels: [
+        TagEntity,
+        LoggedUserEntity,
+        AppPaginatedResponse,
+        AppResponse,
+      ],
     };
     const document = SwaggerModule.createDocument(app, config, options);
     SwaggerModule.setup('api', app, document);

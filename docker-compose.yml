@@ -10,9 +10,10 @@ services:
       - ./docker/nginx/api_gateway.conf:/etc/nginx/api_gateway.conf
       - ./docker/nginx/api_json_errors.conf:/etc/nginx/api_json_errors.conf
       - ./docker/nginx/api_keys.conf:/etc/nginx/api_keys.conf
+      - ./docker/nginx/cors.conf:/etc/nginx/cors.conf
       - ./docker/nginx/api_conf.d:/etc/nginx/api_conf.d
-      - ./docker/nginx/certificates/starter.io.crt:/etc/ssl/certs/starter.io.crt
-      - ./docker/nginx/certificates/starter.io.key:/etc/ssl/certs/starter.io.key
+      - ./docker/nginx/certificates/own-ca/starter.io.crt:/etc/ssl/certs/starter.io.crt
+      - ./docker/nginx/certificates/own-ca/starter.io.key:/etc/ssl/certs/starter.io.key
     build:
       context: ./docker/nginx
     networks:
@@ -65,7 +66,7 @@ services:
       - KC_PROXY=edge
     build:
       context: ./docker/keycloak
-    command: start-dev
+    command: start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     # ports:
     #   - "8080:8080"
     networks:

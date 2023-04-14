@@ -18,6 +18,11 @@ ARG BACKEND_WORKING_DIR=usr/backend
 ENV NODE_ENV=${NODE_ENV}
 ENV BACKEND_WORKING_DIR=${BACKEND_WORKING_DIR}
 
+# Custom certs
+ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/myCA.pem
+COPY ./docker/nginx/certificates/own-ca/certs/myCA.pem /usr/local/share/ca-certificates/myCA.pem
+RUN chmod 644 /usr/local/share/ca-certificates/myCA.pem && update-ca-certificates
+
 # Display versions
 RUN cat /etc/os-release
 RUN node --version
