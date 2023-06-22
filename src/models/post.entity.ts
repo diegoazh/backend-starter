@@ -9,7 +9,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
-import { BaseEntity, IBaseAttributes, UserEntity } from '.';
+import { BaseEntity, IBaseAttributes, ProfileEntity } from '.';
 import { PostType } from '../post/constants/post.constant';
 import { TagExtendedModel } from '../shared/utils';
 import { CategoryEntity } from './category.entity';
@@ -22,7 +22,7 @@ export interface IPostAttributes extends IBaseAttributes {
   content: string;
   mainImage: string;
   images?: string;
-  type: typeof PostType[keyof typeof PostType];
+  type: (typeof PostType)[keyof typeof PostType];
   published: boolean;
   authorId: string;
   categoryId: string;
@@ -60,18 +60,18 @@ export class PostEntity extends BaseEntity<
     type: DataType.ENUM,
     values: Object.values(PostType),
   })
-  type: typeof PostType[keyof typeof PostType];
+  type: (typeof PostType)[keyof typeof PostType];
 
   @ApiProperty()
   @Column
   published: boolean;
 
   @ApiProperty()
-  @ForeignKey(() => UserEntity)
+  @ForeignKey(() => ProfileEntity)
   authorId: string;
 
-  @BelongsTo(() => UserEntity)
-  author: UserEntity;
+  @BelongsTo(() => ProfileEntity)
+  author: ProfileEntity;
 
   @ApiProperty()
   @ForeignKey(() => CategoryEntity)

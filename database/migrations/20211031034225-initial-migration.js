@@ -4,55 +4,55 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
 
     try {
-      const userRoles = ['USER', 'ADMIN'];
+      // const userRoles = ['USER', 'ADMIN'];
       const postTypes = ['TEXT', 'GALLERY'];
 
-      await queryInterface.createTable(
-        'Users',
-        {
-          id: {
-            type: Sequelize.UUID,
-            defaultValue: Sequelize.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-          },
-          email: {
-            type: Sequelize.STRING,
-            allowNull: false,
-            unique: true,
-          },
-          password: {
-            type: Sequelize.STRING,
-            allowNull: false,
-          },
-          role: {
-            type: Sequelize.ENUM,
-            values: userRoles,
-            default: userRoles[0],
-          },
-          username: {
-            type: Sequelize.STRING,
-            allowNull: true,
-          },
-          image: {
-            type: Sequelize.STRING,
-            allowNull: true,
-          },
-          createdAt: {
-            allowNull: false,
-            type: Sequelize.DATE,
-          },
-          updatedAt: {
-            allowNull: false,
-            type: Sequelize.DATE,
-          },
-          deletedAt: {
-            allowNull: true,
-            type: Sequelize.DATE,
-          },
-        },
-        { transaction },
-      );
+      // await queryInterface.createTable(
+      //   'Users',
+      //   {
+      //     id: {
+      //       type: Sequelize.UUID,
+      //       defaultValue: Sequelize.UUIDV4,
+      //       primaryKey: true,
+      //       allowNull: false,
+      //     },
+      //     email: {
+      //       type: Sequelize.STRING,
+      //       allowNull: false,
+      //       unique: true,
+      //     },
+      //     password: {
+      //       type: Sequelize.STRING,
+      //       allowNull: false,
+      //     },
+      //     role: {
+      //       type: Sequelize.ENUM,
+      //       values: userRoles,
+      //       default: userRoles[0],
+      //     },
+      //     username: {
+      //       type: Sequelize.STRING,
+      //       allowNull: true,
+      //     },
+      //     image: {
+      //       type: Sequelize.STRING,
+      //       allowNull: true,
+      //     },
+      //     createdAt: {
+      //       allowNull: false,
+      //       type: Sequelize.DATE,
+      //     },
+      //     updatedAt: {
+      //       allowNull: false,
+      //       type: Sequelize.DATE,
+      //     },
+      //     deletedAt: {
+      //       allowNull: true,
+      //       type: Sequelize.DATE,
+      //     },
+      //   },
+      //   { transaction },
+      // );
 
       await queryInterface.createTable(
         'Profiles',
@@ -62,6 +62,10 @@ module.exports = {
             defaultValue: Sequelize.UUIDV4,
             primaryKey: true,
             allowNull: false,
+          },
+          image: {
+            type: Sequelize.STRING,
+            allowNull: true,
           },
           bio: {
             type: Sequelize.TEXT,
@@ -76,12 +80,9 @@ module.exports = {
             allowNull: true,
           },
           userId: {
-            type: Sequelize.UUID,
-            references: {
-              model: 'Users',
-              key: 'id',
-            },
-            onDelete: 'SET NULL',
+            type: Sequelize.STRING,
+            allowNull: false,
+            unique: true,
           },
           createdAt: {
             allowNull: false,
@@ -111,6 +112,14 @@ module.exports = {
           name: {
             type: Sequelize.STRING,
             allowNull: false,
+          },
+          parentId: {
+            type: Sequelize.UUID,
+            references: {
+              model: 'Categories',
+              key: 'id',
+            },
+            onDelete: 'SET NULL',
           },
           createdAt: {
             allowNull: false,
@@ -194,7 +203,7 @@ module.exports = {
           authorId: {
             type: Sequelize.UUID,
             references: {
-              model: 'Users',
+              model: 'Profiles',
               key: 'id',
             },
             onDelete: 'SET NULL',
@@ -280,7 +289,7 @@ module.exports = {
           authorId: {
             type: Sequelize.UUID,
             references: {
-              model: 'Users',
+              model: 'Profiles',
               key: 'id',
             },
             onDelete: 'SET NULL',
@@ -327,7 +336,7 @@ module.exports = {
       await queryInterface.dropTable('Tags', { transaction });
       await queryInterface.dropTable('Categories', { transaction });
       await queryInterface.dropTable('Profiles', { transaction });
-      await queryInterface.dropTable('Users', { transaction });
+      // await queryInterface.dropTable('Users', { transaction });
 
       await transaction.commit();
     } catch (error) {

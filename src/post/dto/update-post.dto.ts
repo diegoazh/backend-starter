@@ -23,7 +23,7 @@ export class UpdatePostDto {
 
   @IsEnum(PostType)
   @IsNotEmpty()
-  type: typeof PostType[keyof typeof PostType];
+  type: (typeof PostType)[keyof typeof PostType];
 
   @IsBoolean()
   @IsNotEmpty()

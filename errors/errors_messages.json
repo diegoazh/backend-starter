@@ -3,9 +3,11 @@
   "user_pwd_max_length": "The maximum length of the password is 32 characters",
   "user_username_min_length": "The username must be at least of 4 characters",
   "user_username_max_length": "The maximum length of the username is 32 characters",
-  "user_exception_not_found": "Any user was found",
+  "user_not_found": "Any user was found",
+  "user_can_not_be_created": "The user can not be created",
   "profile_exception_not_found": "Any profile was found",
   "post_exception_not_found": "Any post was found",
   "category_exception_not_found": "Any category was found",
-  "tag_exception_not_found": "Any tag was found"
+  "tag_exception_not_found": "Any tag was found",
+  "internal_server_error": "Unexpected error occurs on the server, we are working to solve it"
 }

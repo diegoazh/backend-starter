@@ -1,146 +1,249 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { PostEntity, ProfileEntity, UserEntity } from '../../models';
-import { IAppQueryString } from '../../shared/interfaces';
-import { BcryptService } from '../../shared/services/bcrypt.service';
+import { Injectable, Logger } from '@nestjs/common';
+import qs from 'qs';
+import { request } from 'undici';
+import { IKeycloakUser, IKeycloakUserQuery } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
-import { UserRole } from '../constants/user.constant';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { PatchUserDto } from '../dto/patch-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { UserWithoutPassword } from '../types/user-types.type';
+import { keycloakResponseChecker } from '../../shared/utils';
+import { CreateUserDto, PatchUserDto, UpdateUserDto } from '../dto';
+import { UserEntity } from '../models';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   private readonly takeLimit: number;
 
-  constructor(
-    @InjectModel(UserEntity)
-    private readonly User: typeof UserEntity,
-    private readonly bcrypt: BcryptService,
-    private readonly nodeConfigService: NodeConfigService,
-  ) {
+  private readonly authServerUrl: string;
+
+  private readonly realm: string;
+
+  private usersUrl: string;
+
+  private defaultHeaders = { 'Content-Type': 'application/json' };
+
+  constructor(private readonly nodeConfigService: NodeConfigService) {
     this.takeLimit = this.nodeConfigService.config.get<number>('user.takeMax');
+    this.authServerUrl = this.nodeConfigService.config.get<string>(
+      'keycloak.authServerUrl',
+    );
+    this.realm = this.nodeConfigService.config.get<string>('keycloak.realm');
+    this.usersUrl = `${this.authServerUrl}/admin/realms/${this.realm}/users`;
   }
 
-  public find(query?: IAppQueryString): Promise<UserEntity[]> {
-    const { pageSize = this.takeLimit, pageIndex = 0, filter } = query;
+  public async find(authorization: string): Promise<UserEntity[]> {
+    try {
+      const res = await request(this.usersUrl, {
+        headers: { ...this.defaultHeaders, authorization },
+      });
+      const users = await await keycloakResponseChecker<IKeycloakUser[]>(res);
 
-    return this.User.findAll({
-      limit: pageSize,
-      offset: pageIndex * pageSize,
-      where: {
-        ...filter,
-      },
-      include: [
-        {
-          model: ProfileEntity,
-          attributes: {
-            exclude: ['userId'],
-          },
-        },
-        {
-          model: PostEntity,
-          attributes: {
-            exclude: ['userId'],
-          },
-        },
-      ],
-      order: [['createdAt', 'DESC']],
-    });
+      return users.map((user) => new UserEntity(user));
+    } catch (error) {
+      this.logger.error(`USER_FIND: ${error}`);
+      throw error;
+    }
   }
 
-  public findById(id: string): Promise<UserEntity | null> {
-    return this.User.findByPk(id);
+  public async findById(
+    id: string,
+    authorization: string,
+  ): Promise<UserEntity | null> {
+    try {
+      const res = await request(`${this.usersUrl}/${id}`, {
+        headers: { ...this.defaultHeaders, authorization },
+      });
+      const newUserData = await keycloakResponseChecker<IKeycloakUser>(res);
+
+      return new UserEntity(newUserData);
+    } catch (error) {
+      this.logger.error(`USER_FIND_BY_ID: ${error}`);
+      throw error;
+    }
   }
 
-  public findOne(userData: UserWithoutPassword): Promise<UserEntity> {
-    return this.User.findOne({
-      where: {
-        ...(userData as any),
-      },
-      include: [
-        {
-          model: ProfileEntity,
-          attributes: {
-            exclude: ['userId'],
-          },
-        },
-        {
-          model: PostEntity,
-          attributes: {
-            exclude: ['userId'],
-          },
-        },
-      ],
-    });
+  public async findOne(
+    userData: IKeycloakUserQuery,
+    authorization: string,
+  ): Promise<UserEntity[]> {
+    try {
+      const query = qs.stringify(userData);
+      this.logger.log(`Request URL: ${this.usersUrl}?${query}`);
+      const res = await request(`${this.usersUrl}?${query}`, {
+        headers: { ...this.defaultHeaders, authorization },
+      });
+      const result = await keycloakResponseChecker<IKeycloakUser[]>(res);
+
+      return result.map((value) => new UserEntity(value));
+    } catch (error) {
+      this.logger.error(`USER_FIND_ONE: ${error}`);
+      throw error;
+    }
   }
 
-  public async count(query?: IAppQueryString): Promise<{ count: number }> {
-    const { filter } = query;
+  public async count(authorization: string): Promise<{ count: number }> {
+    try {
+      const res = await request(`${this.usersUrl}/count`, {
+        headers: { ...this.defaultHeaders, authorization },
+      });
+      const count = await keycloakResponseChecker<number>(res);
 
-    const count = await this.User.count({
-      where: {
-        ...filter,
-      },
-    });
-
-    return { count };
+      return { count };
+    } catch (error) {
+      this.logger.error(`USER_COUNT: ${error}`);
+      throw error;
+    }
   }
 
-  public create(data: CreateUserDto): Promise<UserEntity> {
-    const password = this.bcrypt.hashPassword(data.password);
+  public async create(
+    data: CreateUserDto,
+    authorization: string,
+  ): Promise<UserEntity | null> {
+    try {
+      const { password, ...body } = data;
+      let res = await request(this.usersUrl, {
+        headers: { ...this.defaultHeaders, authorization },
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
 
-    return this.User.create({ ...data, password, role: UserRole.USER });
+      await keycloakResponseChecker(res);
+
+      const user = await this.findOne(
+        { email: body.email, username: body.username },
+        authorization,
+      );
+      await this.updateCredentials(user[0].id, password, authorization);
+
+      return user[0];
+    } catch (error) {
+      this.logger.error(`USER_CREATE: ${error}`);
+      throw error;
+    }
   }
 
   public async overwrite(
     id: string,
     data: UpdateUserDto,
+    authorization: string,
   ): Promise<UserEntity | undefined> {
-    const savedUser = await this.findById(id);
+    try {
+      const savedUser = await this.findById(id, authorization);
 
-    if (savedUser) {
-      savedUser.email = data.email;
-      savedUser.password = this.bcrypt.hashPassword(data.password);
-      savedUser.username = data.username;
+      if (savedUser) {
+        const url = `${this.usersUrl}/${id}`;
 
-      return savedUser.save();
+        const res = await request(url, {
+          headers: { ...this.defaultHeaders, authorization },
+          method: 'PUT',
+          body: JSON.stringify(data),
+        });
+
+        await keycloakResponseChecker(res);
+
+        return await this.findById(id, authorization);
+      }
+    } catch (error) {
+      this.logger.error(`USER_OVERWRITE: ${error}`);
+      throw error;
     }
   }
 
   public async update(
     id: string,
     data: PatchUserDto,
+    authorization: string,
   ): Promise<UserEntity | undefined> {
-    const savedUser = await this.findById(id);
+    try {
+      const savedUser = await this.findById(id, authorization);
 
-    if (savedUser) {
-      if (data.email) {
-        savedUser.email = data.email;
+      if (savedUser) {
+        const url = `${this.usersUrl}/${id}`;
+        const body: PatchUserDto = {};
+
+        if (data.email) {
+          body.email = data.email;
+        }
+
+        if (data.emailVerified != null) {
+          body.emailVerified = data.emailVerified;
+        }
+
+        if (data.enabled != null) {
+          body.enabled = data.enabled;
+        }
+
+        if (data.firstName) {
+          body.firstName = data.firstName;
+        }
+
+        if (data.groups != null) {
+          body.groups = [...data.groups];
+        }
+
+        if (data.requiredActions) {
+          body.requiredActions = [...data.requiredActions];
+        }
+
+        if (data.lastName) {
+          body.lastName = data.lastName;
+        }
+
+        if (data.username) {
+          body.username = data.username;
+        }
+
+        const res = await request(url, {
+          headers: { ...this.defaultHeaders, authorization },
+          method: 'PUT',
+          body: JSON.stringify(data),
+        });
+
+        await keycloakResponseChecker(res);
+
+        return await this.findById(id, authorization);
       }
-
-      if (data.password) {
-        savedUser.password = this.bcrypt.hashPassword(data.password);
-      }
-
-      if (data.username) {
-        savedUser.username = data.username;
-      }
-
-      return savedUser.save();
+    } catch (error) {
+      this.logger.error(`USER_UPDATE: ${error}`);
+      throw error;
     }
   }
 
-  public async remove(id: string): Promise<{ deleted: number }> {
-    const savedUser = await this.findById(id);
+  public async remove(id: string, authorization: string): Promise<void> {
+    try {
+      const url = `${this.usersUrl}/${id}`;
+      const res = await request(url, {
+        method: 'DELETE',
+        headers: { ...this.defaultHeaders, authorization },
+      });
 
-    if (!savedUser) {
-      throw new NotFoundException({ message: 'user_exception_not_found' });
+      await keycloakResponseChecker(res);
+    } catch (error) {
+      this.logger.error(`USER_REMOVE: ${error}`);
+      throw error;
     }
+  }
 
-    const deleted = await this.User.destroy({ where: { id } });
+  public async updateCredentials(
+    id: string,
+    password: string,
+    authorization: string,
+  ): Promise<void> {
+    try {
+      const reqBody = {
+        temporary: true,
+        type: 'password',
+        value: password,
+      };
+      const res = await request(`${this.usersUrl}/${id}/reset-password`, {
+        headers: { ...this.defaultHeaders, authorization },
+        method: 'PUT',
+        body: JSON.stringify(reqBody),
+      });
 
-    return { deleted };
+      await keycloakResponseChecker(res);
+    } catch (error) {
+      this.logger.error(`USER_UPDATE_CREDENTIALS: ${error}`);
+      console.error(error);
+    }
   }
 }

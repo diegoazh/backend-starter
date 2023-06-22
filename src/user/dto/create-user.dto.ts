@@ -1,4 +1,6 @@
 import {
+  IsArray,
+  IsBoolean,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -24,4 +26,28 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   username?: string;
+
+  @IsString()
+  @IsOptional()
+  firstName?: string;
+
+  @IsString()
+  @IsOptional()
+  lastName?: string;
+
+  @IsArray()
+  @IsOptional()
+  requiredActions?: any[]; // TODO: fix this any type and the IsArray decorator
+
+  @IsBoolean()
+  @IsOptional()
+  emailVerified?: boolean;
+
+  @IsArray()
+  @IsOptional()
+  groups?: any[];
+
+  @IsBoolean()
+  @IsOptional()
+  enabled?: boolean;
 }

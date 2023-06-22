@@ -11,7 +11,7 @@ import { version } from '../package.json';
 import { AppModule } from './app.module';
 import { TagEntity } from './models';
 import { AppPaginatedResponse, AppResponse } from './shared/responses';
-import { LoggedUserEntity } from './user/models';
+import { LoggedUserEntity, UserEntity } from './user/models';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -24,7 +24,7 @@ async function bootstrap(): Promise<void> {
   // });
 
   app.use(helmet());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
@@ -37,6 +37,7 @@ async function bootstrap(): Promise<void> {
     const options: SwaggerDocumentOptions = {
       extraModels: [
         TagEntity,
+        UserEntity,
         LoggedUserEntity,
         AppPaginatedResponse,
         AppResponse,

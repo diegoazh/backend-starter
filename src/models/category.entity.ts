@@ -1,11 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, HasMany, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  ForeignKey,
+  HasMany,
+  Table,
+} from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { PostEntity } from './post.entity';
 
 export interface ICategoryAttributes extends IBaseAttributes {
   name: string;
+  parentId?: string;
 }
 
 interface ICategoryCreationAttributes
@@ -22,6 +29,17 @@ export class CategoryEntity extends BaseEntity<
   @ApiProperty()
   @Column
   name: string;
+
+  @ApiProperty()
+  @ForeignKey(() => CategoryEntity)
+  parentId?: string;
+
+  @BelongsTo(() => CategoryEntity)
+  parent: CategoryEntity;
+
+  @ApiProperty({ type: () => [CategoryEntity] })
+  @HasMany(() => CategoryEntity)
+  subcategories: CategoryEntity[];
 
   @ApiProperty({ type: () => [PostEntity] })
   @HasMany(() => PostEntity)

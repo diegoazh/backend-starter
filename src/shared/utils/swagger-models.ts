@@ -36,7 +36,7 @@ export class PostExtendedModel implements IPostAttributes {
   images?: string;
 
   @ApiProperty({ enum: Object.values(PostType) })
-  type: typeof PostType[keyof typeof PostType];
+  type: (typeof PostType)[keyof typeof PostType];
 
   @ApiProperty()
   published: boolean;

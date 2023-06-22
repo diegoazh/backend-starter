@@ -4,32 +4,45 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpException,
   HttpStatus,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   Patch,
+  Post,
   Put,
-  Query,
+  Req,
 } from '@nestjs/common';
 import {
-  ApiFoundResponse,
+  ApiAcceptedResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { UserEntity } from '../../models';
-import { IAppQueryString } from '../../shared/interfaces';
+import { Request } from 'express';
+import { Resource, Scopes } from 'nest-keycloak-connect';
+import errors from '../../../errors/errors_messages.json';
+import { AppScopes } from '../../shared/constants';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
-import { PatchUserDto } from '../dto/patch-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import { CreateUserDto, PatchUserDto, UpdateUserDto } from '../dto';
+import { UserEntity } from '../models';
 import { UserService } from '../services/user.service';
 
 @ApiTags('Users controller')
+@ApiBearerAuth()
+@Resource('user')
 @Controller('users')
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
+
   constructor(private readonly userService: UserService) {}
 
   @ApiOkResponse({
@@ -52,38 +65,24 @@ export class UserController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
   @Get()
-  async find(
-    @Query() query?: IAppQueryString,
-  ): Promise<AppPaginatedResponse<UserEntity[]>> {
-    const users = await this.userService.find(query);
+  async find(@Req() req: Request): Promise<AppPaginatedResponse<UserEntity[]>> {
+    try {
+      const { authorization } = req.headers;
+      const users = await this.userService.find(authorization);
 
-    return { data: users.map((user) => user.toJSON()) };
-  }
+      return { data: users };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
 
-  @ApiFoundResponse({
-    description: 'A user object that match with the provided id',
-    schema: {
-      properties: {
-        data: { $ref: getSchemaPath(UserEntity) },
-      },
-    },
-  })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiUnauthorizedResponse({
-    description: 'When hit the endpoint without a valid login',
-  })
-  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @HttpCode(HttpStatus.FOUND)
-  @Get(':id')
-  async findById(@Param('id') id: string): Promise<AppResponse<UserEntity>> {
-    const user = await this.userService.findById(id);
-
-    if (!user) {
-      throw new NotFoundException('user_exception_not_found');
+      throw new InternalServerErrorException(error.message, {
+        cause: error,
+        description: errors.internal_server_error,
+      });
     }
-
-    return { data: user.toJSON() };
   }
 
   @ApiOkResponse({
@@ -100,17 +99,102 @@ export class UserController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
   @Get('count')
-  async count(
-    @Query()
-    query?: IAppQueryString,
-  ): Promise<AppPaginatedResponse<number>> {
-    const { count } = await this.userService.count(query);
+  async count(@Req() req: Request): Promise<AppPaginatedResponse<number>> {
+    try {
+      const { authorization } = req.headers;
+      const { count } = await this.userService.count(authorization);
 
-    return { data: count };
+      return { data: count };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(error.message, {
+        cause: error,
+        description: errors.internal_server_error,
+      });
+    }
   }
 
   @ApiOkResponse({
+    description: 'A user object that match with the provided id',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(UserEntity) },
+      },
+    },
+  })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({
+    description: 'When hit the endpoint without a valid login',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
+  @Get(':id')
+  async findById(
+    @Req() req: Request,
+    @Param('id') id: string,
+  ): Promise<AppResponse<UserEntity>> {
+    try {
+      const { authorization } = req.headers;
+      const user = await this.userService.findById(id, authorization);
+
+      if (!user) {
+        throw new NotFoundException(errors.user_not_found, {
+          cause: new Error(errors.user_not_found),
+          description: errors.user_not_found,
+        });
+      }
+
+      return { data: user };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(error.message, {
+        cause: error,
+        description: errors.internal_server_error,
+      });
+    }
+  }
+
+  @ApiCreatedResponse({
+    description: 'The user was created successfully',
+    schema: {
+      properties: {
+        data: { $ref: getSchemaPath(UserEntity) },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'When hit the endpoint without a valid login',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.CREATE)
+  @HttpCode(HttpStatus.CREATED)
+  @Post()
+  async create(
+    @Req() req: Request,
+    @Body() data: CreateUserDto,
+  ): Promise<AppPaginatedResponse<UserEntity>> {
+    try {
+      const { authorization } = req.headers;
+      const user = await this.userService.create(data, authorization);
+      return { data: user };
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException(error.message, {
+        cause: error,
+        description: errors.user_can_not_be_created,
+      });
+    }
+  }
+
+  @ApiAcceptedResponse({
     description: 'The user was overwrite successfully',
     schema: {
       properties: {
@@ -122,17 +206,38 @@ export class UserController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.UPDATE)
+  @HttpCode(HttpStatus.ACCEPTED)
   @Put(':id')
   async overwrite(
+    @Req() req: Request,
     @Param('id') id: string,
     @Body() user: UpdateUserDto,
   ): Promise<AppResponse<UserEntity>> {
-    const updatedUser = await this.userService.overwrite(id, user);
+    try {
+      const { authorization } = req.headers;
+      const updatedUser = await this.userService.overwrite(
+        id,
+        user,
+        authorization,
+      );
 
-    return { data: updatedUser.toJSON() };
+      return { data: updatedUser };
+    } catch (error) {
+      this.logger.error(error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(error.message, {
+        cause: error,
+        description: errors.internal_server_error,
+      });
+    }
   }
 
-  @ApiOkResponse({
+  @ApiAcceptedResponse({
     description: 'The properties of the user were updated successfully',
     schema: {
       properties: {
@@ -144,32 +249,43 @@ export class UserController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.UPDATE)
+  @HttpCode(HttpStatus.ACCEPTED)
   @Patch(':id')
   async update(
+    @Req() req: Request,
     @Param('id') id: string,
     user: PatchUserDto,
   ): Promise<AppResponse<UserEntity>> {
-    const updatedUser = await this.userService.update(id, user);
+    const { authorization } = req.headers;
+    const updatedUser = await this.userService.update(id, user, authorization);
 
-    return { data: updatedUser.toJSON() };
+    return { data: updatedUser };
   }
 
-  @ApiOkResponse({
+  @ApiNoContentResponse({
     description: 'The user was deleted successfully',
-    schema: {
-      properties: {
-        data: { type: 'integer' },
-      },
-    },
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.DELETE)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<AppResponse<number>> {
-    const { deleted } = await this.userService.remove(id);
+  async remove(@Req() req: Request, @Param('id') id: string): Promise<void> {
+    try {
+      const { authorization } = req.headers;
+      await this.userService.remove(id, authorization);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
 
-    return { data: deleted };
+      throw new InternalServerErrorException(error.message, {
+        cause: error,
+        description: errors.internal_server_error,
+      });
+    }
   }
 }

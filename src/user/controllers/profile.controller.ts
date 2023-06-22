@@ -11,7 +11,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
@@ -24,13 +23,14 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { AuthenticatedRequest } from '../../auth/types/authenticated-request.type';
 import { ProfileEntity } from '../../models';
+import { LoggedUser } from '../../shared/decorators';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { LoggedUserEntity } from '../models';
 import { ProfileService } from '../services/profile.service';
 
 @ApiTags('Profiles controller')
@@ -69,6 +69,28 @@ export class ProfileController {
     };
   }
 
+  @ApiOkResponse({
+    description: 'The sum of all profiles found in the system',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'When hit the endpoint without a valid login',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Get('count')
+  async count(
+    @Query()
+    query?: IAppQueryString,
+  ): Promise<AppResponse<number>> {
+    const { count } = await this.profileService.count(query);
+
+    return { data: count };
+  }
+
   @ApiFoundResponse({
     description: 'A profile object that match with the provided id',
     schema: {
@@ -94,28 +116,6 @@ export class ProfileController {
     return { data: profile.toJSON() };
   }
 
-  @ApiOkResponse({
-    description: 'The sum of all profiles found in the system',
-    schema: {
-      properties: {
-        data: { type: 'integer' },
-      },
-    },
-  })
-  @ApiUnauthorizedResponse({
-    description: 'When hit the endpoint without a valid login',
-  })
-  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @Get('count')
-  async count(
-    @Query()
-    query?: IAppQueryString,
-  ): Promise<AppResponse<number>> {
-    const { count } = await this.profileService.count(query);
-
-    return { data: count };
-  }
-
   @ApiCreatedResponse({
     description: 'A profile was created successfully',
     schema: {
@@ -135,9 +135,9 @@ export class ProfileController {
   @Post()
   async create(
     @Body() profile: CreateProfileDto,
-    @Req() req: AuthenticatedRequest,
+    @LoggedUser() user: LoggedUserEntity,
   ): Promise<AppResponse<ProfileEntity>> {
-    const newProfile = await this.profileService.create(profile, req.user);
+    const newProfile = await this.profileService.create(profile, user);
 
     return { data: newProfile.toJSON() };
   }

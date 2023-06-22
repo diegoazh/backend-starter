@@ -3,7 +3,7 @@ import { BelongsTo, Column, ForeignKey, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { PostEntity } from './post.entity';
-import { UserEntity } from './user.entity';
+import { ProfileEntity } from './profile.entity';
 
 export interface ICommentAttributes extends IBaseAttributes {
   content: string;
@@ -25,11 +25,11 @@ export class CommentEntity extends BaseEntity<
   content: string;
 
   @ApiProperty()
-  @ForeignKey(() => UserEntity)
+  @ForeignKey(() => ProfileEntity)
   authorId: string;
 
-  @BelongsTo(() => UserEntity)
-  author: UserEntity;
+  @BelongsTo(() => ProfileEntity)
+  author: ProfileEntity;
 
   @ApiProperty()
   @ForeignKey(() => PostEntity)

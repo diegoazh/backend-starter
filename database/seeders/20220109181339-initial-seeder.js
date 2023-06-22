@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type -- js file */
 const { faker } = require('@faker-js/faker');
-const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
@@ -9,27 +9,27 @@ module.exports = {
 
     try {
       let i = 5;
-      const users = [];
+      // const users = [];
       const profiles = [];
       const posts = [];
       const currentDate = new Date();
 
-      while (i--) {
-        users.push({
-          id: uuidv4(),
-          email: faker.internet.email(),
-          password: bcrypt.hashSync('secret', bcrypt.genSaltSync(10)),
-          role: faker.helpers.arrayElement(['USER', 'ADMIN']),
-          username: faker.internet.userName(),
-          image: faker.image.avatar(),
-          createdAt: faker.date.recent(10, currentDate),
-          updatedAt: faker.date.recent(10, currentDate),
-        });
-      }
+      // while (i--) {
+      //   users.push({
+      //     id: uuidv4(),
+      //     email: faker.internet.email(),
+      //     password: bcrypt.hashSync('secret', bcrypt.genSaltSync(10)),
+      //     role: faker.helpers.arrayElement(['USER', 'ADMIN']),
+      //     username: faker.internet.userName(),
+      //     image: faker.image.avatar(),
+      //     createdAt: faker.date.recent(10, currentDate),
+      //     updatedAt: faker.date.recent(10, currentDate),
+      //   });
+      // }
 
-      console.info('users: ', JSON.stringify(users, null, 2));
+      // console.info('users: ', JSON.stringify(users, null, 2));
 
-      await queryInterface.bulkInsert('Users', users, { transaction });
+      // await queryInterface.bulkInsert('Users', users, { transaction });
 
       i = 5;
 
@@ -67,7 +67,7 @@ module.exports = {
           mainImage: faker.image.abstract(),
           images: images.join('|'),
           published: true,
-          authorId: users[faker.helpers.arrayElement([0, 1, 2, 3, 4])].id,
+          authorId: profiles[faker.helpers.arrayElement([0, 1, 2, 3, 4])].id,
           createdAt: faker.date.recent(10, currentDate),
           updatedAt: faker.date.recent(10, currentDate),
         });

@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ProfileEntity, UserEntity } from '../../models';
+import { ProfileEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { UserWithoutPassword } from '../types/user-types.type';
+import { LoggedUserEntity } from '../models';
 
 @Injectable()
 export class ProfileService {
@@ -33,7 +33,6 @@ export class ProfileService {
       attributes: {
         exclude: ['userId'],
       },
-      include: [UserEntity],
     });
   }
 
@@ -55,7 +54,7 @@ export class ProfileService {
 
   public create(
     { bio, firstName, lastName }: CreateProfileDto,
-    loggedUser: UserWithoutPassword,
+    loggedUser: LoggedUserEntity,
   ): Promise<ProfileEntity> {
     return this.Profile.create({
       bio,

@@ -20,7 +20,7 @@ export class KeycloakConfigService implements KeycloakConnectOptionsFactory {
       realm: this.nodeConfig.config.get('keycloak.realm'),
       clientId: this.nodeConfig.config.get('keycloak.clientId'),
       secret: this.nodeConfig.config.get('keycloak.clientSecret'),
-      policyEnforcement: PolicyEnforcementMode.PERMISSIVE,
+      policyEnforcement: PolicyEnforcementMode.ENFORCING,
       tokenValidation: TokenValidation.ONLINE,
       bearerOnly: true,
       realmPublicKey:

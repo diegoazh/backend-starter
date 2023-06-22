@@ -11,7 +11,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -27,10 +26,12 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { Resource, Scopes } from 'nest-keycloak-connect';
-import { AuthenticatedRequest } from '../../auth/types/authenticated-request.type';
 import { PostEntity } from '../../models';
+import { AppScopes } from '../../shared/constants';
+import { LoggedUser } from '../../shared/decorators';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
+import { LoggedUserEntity } from '../../user/models';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -66,7 +67,7 @@ export class PostController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   // @Roles({ roles: ['admin'] })
-  @Scopes('read')
+  @Scopes(AppScopes.READ)
   @Get()
   async find(
     @Query() query?: IAppQueryString,
@@ -76,6 +77,26 @@ export class PostController {
     return {
       data: posts.map((post) => post.toJSON()),
     };
+  }
+
+  @ApiOkResponse({
+    description: 'A sum of all posts in the system',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
+  @Get('count')
+  async count(
+    @Query()
+    query?: IAppQueryString,
+  ): Promise<AppResponse<number>> {
+    const { count } = await this.postService.count(query);
+
+    return { data: count };
   }
 
   @ApiFoundResponse({
@@ -89,6 +110,7 @@ export class PostController {
   @ApiNotFoundResponse({ description: 'Any post was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
+  @Scopes(AppScopes.READ)
   @Get(':id')
   async findById(@Param('id') id: string): Promise<AppResponse<PostEntity>> {
     const post = await this.postService.findById(id);
@@ -98,25 +120,6 @@ export class PostController {
     }
 
     return { data: post.toJSON() };
-  }
-
-  @ApiOkResponse({
-    description: 'A sum of all posts in the system',
-    schema: {
-      properties: {
-        data: { type: 'integer' },
-      },
-    },
-  })
-  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @Get('count')
-  async count(
-    @Query()
-    query?: IAppQueryString,
-  ): Promise<AppResponse<number>> {
-    const { count } = await this.postService.count(query);
-
-    return { data: count };
   }
 
   @ApiCreatedResponse({
@@ -137,9 +140,9 @@ export class PostController {
   @Post()
   async create(
     @Body() postData: CreatePostDto,
-    @Req() req: AuthenticatedRequest,
+    @LoggedUser() user: LoggedUserEntity,
   ): Promise<AppResponse<PostEntity>> {
-    const newPost = await this.postService.create(postData, req.user);
+    const newPost = await this.postService.create(postData, user);
 
     return { data: newPost.toJSON() };
   }

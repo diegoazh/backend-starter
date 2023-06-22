@@ -13,6 +13,7 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiFoundResponse,
@@ -23,6 +24,7 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { Public, Resource, Scopes } from 'nest-keycloak-connect';
 import { TagEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
@@ -30,8 +32,10 @@ import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchTagDto } from '../dto/patch-tag.dto';
 import { UpdateTagDto } from '../dto/update-tag.dto';
 import { TagService } from '../services/tag.service';
+import { AppScopes } from '../../shared/constants';
 
 @ApiTags('Tags controller')
+@Resource('tag')
 @Controller('tags')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
@@ -53,6 +57,8 @@ export class TagController {
     },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
+  @Public()
   @Get()
   public async find(
     @Query() query?: IAppQueryString,
@@ -62,6 +68,26 @@ export class TagController {
     return {
       data: tags.map((tag) => tag.toJSON()),
     };
+  }
+
+  @ApiOkResponse({
+    description: 'A sum of all categories in the system',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Public()
+  @Get('count')
+  async count(
+    @Query()
+    query?: IAppQueryString,
+  ): Promise<AppResponse<number>> {
+    const { count } = await this.tagService.count(query);
+
+    return { data: count };
   }
 
   @ApiFoundResponse({
@@ -75,6 +101,7 @@ export class TagController {
   @ApiNotFoundResponse({ description: 'Any tag was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
+  @Public()
   @Get(':id')
   public async findById(
     @Param('id') id: string,
@@ -86,25 +113,6 @@ export class TagController {
     }
 
     return { data: tag.toJSON() };
-  }
-
-  @ApiOkResponse({
-    description: 'A sum of all categories in the system',
-    schema: {
-      properties: {
-        data: { type: 'integer' },
-      },
-    },
-  })
-  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @Get('count')
-  async count(
-    @Query()
-    query?: IAppQueryString,
-  ): Promise<AppResponse<number>> {
-    const { count } = await this.tagService.count(query);
-
-    return { data: count };
   }
 
   @ApiCreatedResponse({
@@ -122,6 +130,8 @@ export class TagController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @ApiBearerAuth()
+  @Scopes(AppScopes.CREATE)
   @Post()
   public async create(
     @Body() tagData: CreateTagDto,
@@ -143,6 +153,8 @@ export class TagController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @ApiBearerAuth()
+  @Scopes(AppScopes.UPDATE)
   @Put(':id')
   public async overwrite(
     @Param('id') id: string,
@@ -165,6 +177,8 @@ export class TagController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @ApiBearerAuth()
+  @Scopes(AppScopes.UPDATE)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -187,6 +201,8 @@ export class TagController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @ApiBearerAuth()
+  @Scopes(AppScopes.DELETE)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.tagService.remove(id);

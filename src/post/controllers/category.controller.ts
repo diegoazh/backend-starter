@@ -63,6 +63,25 @@ export class CategoryController {
     };
   }
 
+  @ApiOkResponse({
+    description: 'A sum of all categories in the system',
+    schema: {
+      properties: {
+        data: { type: 'integer' },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Get('count')
+  async count(
+    @Query()
+    query?: IAppQueryString,
+  ): Promise<AppResponse<number>> {
+    const { count } = await this.categoryService.count(query);
+
+    return { data: count };
+  }
+
   @ApiFoundResponse({
     description: 'A found category',
     schema: {
@@ -85,25 +104,6 @@ export class CategoryController {
     }
 
     return { data: category.toJSON() };
-  }
-
-  @ApiOkResponse({
-    description: 'A sum of all categories in the system',
-    schema: {
-      properties: {
-        data: { type: 'integer' },
-      },
-    },
-  })
-  @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  @Get('count')
-  async count(
-    @Query()
-    query?: IAppQueryString,
-  ): Promise<AppResponse<number>> {
-    const { count } = await this.categoryService.count(query);
-
-    return { data: count };
   }
 
   @ApiCreatedResponse({

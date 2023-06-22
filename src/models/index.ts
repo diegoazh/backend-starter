@@ -5,4 +5,3 @@ export * from './post-tag.entity';
 export * from './post.entity';
 export * from './profile.entity';
 export * from './tag.entity';
-export * from './user.entity';

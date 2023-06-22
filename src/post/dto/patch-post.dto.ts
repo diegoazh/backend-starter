@@ -23,7 +23,7 @@ export class PatchPostDto {
 
   @IsEnum(PostType)
   @IsOptional()
-  type?: typeof PostType[keyof typeof PostType];
+  type?: (typeof PostType)[keyof typeof PostType];
 
   @IsBoolean()
   @IsOptional()
