@@ -6,7 +6,7 @@ import { NodeConfigService } from '../../shared/services/node-config.service';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { LoggedUserEntity } from '../models';
+import { LoggedUserModel } from '../models';
 
 @Injectable()
 export class ProfileService {
@@ -54,7 +54,7 @@ export class ProfileService {
 
   public create(
     { bio, firstName, lastName }: CreateProfileDto,
-    loggedUser: LoggedUserEntity,
+    loggedUser: LoggedUserModel,
   ): Promise<ProfileEntity> {
     return this.Profile.create({
       bio,

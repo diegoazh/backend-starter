@@ -31,7 +31,7 @@ import { AppScopes } from '../../shared/constants';
 import { LoggedUser } from '../../shared/decorators';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
-import { LoggedUserEntity } from '../../user/models';
+import { LoggedUserModel } from '../../user/models';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -140,7 +140,7 @@ export class PostController {
   @Post()
   async create(
     @Body() postData: CreatePostDto,
-    @LoggedUser() user: LoggedUserEntity,
+    @LoggedUser() user: LoggedUserModel,
   ): Promise<AppResponse<PostEntity>> {
     const newPost = await this.postService.create(postData, user);
 

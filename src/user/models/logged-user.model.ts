@@ -1,6 +1,6 @@
 import { IKeycloakLoggedUserEntity } from '../../shared/interfaces';
 
-export class LoggedUserEntity implements IKeycloakLoggedUserEntity {
+export class LoggedUserModel implements IKeycloakLoggedUserEntity {
   exp: number;
 
   iat: number;

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IPostAttributes, ITagAttributes, PostTagEntity } from '../../models';
 import { PostType } from '../../post/constants/post.constant';
+import { WrapperType } from '../types';
 
 export class TagExtendedModel implements ITagAttributes {
   @ApiProperty()
@@ -10,7 +11,7 @@ export class TagExtendedModel implements ITagAttributes {
   id: string;
 
   @ApiProperty({ type: () => PostTagEntity })
-  PostTagEntity: PostTagEntity;
+  PostTagEntity: WrapperType<PostTagEntity>;
 
   @ApiProperty()
   createdAt: Date;
@@ -51,7 +52,7 @@ export class PostExtendedModel implements IPostAttributes {
   id: string;
 
   @ApiProperty({ type: () => PostTagEntity })
-  PostTagEntity: PostTagEntity;
+  PostTagEntity: WrapperType<PostTagEntity>;
 
   @ApiProperty()
   createdAt: Date;

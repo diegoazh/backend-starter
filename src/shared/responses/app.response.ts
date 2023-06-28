@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IApiResponse } from '../interfaces/api-response.interface';
 
-class PaginationLinks {
+export class PaginationLinks {
   @ApiProperty({ type: String })
   self: string;
 

@@ -54,31 +54,30 @@ export class TagService {
   }
 
   public async overwrite(id: string, data: CreateTagDto): Promise<TagEntity> {
-    const categoryFounded = await this.findById(id);
+    const tagFound = await this.findById(id);
 
-    if (categoryFounded) {
-      categoryFounded.name = data.name;
-
-      return categoryFounded.save();
+    if (tagFound) {
+      tagFound.set({ ...data });
+      return tagFound.save();
     }
   }
 
   public async update(id: string, data: PatchCategoryDto): Promise<TagEntity> {
-    const tagFounded = await this.findById(id);
+    const tagFound = await this.findById(id);
 
-    if (tagFounded) {
+    if (tagFound) {
       if (data.name) {
-        tagFounded.name = data.name;
+        tagFound.set({ name: data.name });
       }
 
-      return tagFounded.save();
+      return tagFound.save();
     }
   }
 
   public async remove(id: string): Promise<{ deleted: number }> {
-    const categoryFounded = await this.findById(id);
+    const tagFound = await this.findById(id);
 
-    if (!categoryFounded) {
+    if (!tagFound) {
       throw new NotFoundException('category_exception_not_found');
     }
 

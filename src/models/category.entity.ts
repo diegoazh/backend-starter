@@ -9,6 +9,7 @@ import {
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { PostEntity } from './post.entity';
+import { WrapperType } from '../shared/types';
 
 export interface ICategoryAttributes extends IBaseAttributes {
   name: string;
@@ -35,13 +36,13 @@ export class CategoryEntity extends BaseEntity<
   parentId?: string;
 
   @BelongsTo(() => CategoryEntity)
-  parent: CategoryEntity;
+  parent: WrapperType<CategoryEntity>;
 
   @ApiProperty({ type: () => [CategoryEntity] })
   @HasMany(() => CategoryEntity)
-  subcategories: CategoryEntity[];
+  subcategories: WrapperType<CategoryEntity[]>;
 
   @ApiProperty({ type: () => [PostEntity] })
   @HasMany(() => PostEntity)
-  posts: PostEntity[];
+  posts: WrapperType<PostEntity[]>;
 }

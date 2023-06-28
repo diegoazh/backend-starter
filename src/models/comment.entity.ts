@@ -4,6 +4,7 @@ import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { PostEntity } from './post.entity';
 import { ProfileEntity } from './profile.entity';
+import { WrapperType } from '../shared/types/app.type';
 
 export interface ICommentAttributes extends IBaseAttributes {
   content: string;
@@ -29,12 +30,12 @@ export class CommentEntity extends BaseEntity<
   authorId: string;
 
   @BelongsTo(() => ProfileEntity)
-  author: ProfileEntity;
+  author: WrapperType<ProfileEntity>;
 
   @ApiProperty()
   @ForeignKey(() => PostEntity)
   postId: string;
 
   @BelongsTo(() => PostEntity)
-  post: PostEntity;
+  post: WrapperType<PostEntity>;
 }

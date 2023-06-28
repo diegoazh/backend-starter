@@ -1,2 +1,2 @@
-export * from './logged-user.entity';
-export * from './user.entity';
+export * from './logged-user.model';
+export * from './user.model';

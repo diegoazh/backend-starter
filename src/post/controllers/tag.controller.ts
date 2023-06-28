@@ -26,13 +26,13 @@ import {
 } from '@nestjs/swagger';
 import { Public, Resource, Scopes } from 'nest-keycloak-connect';
 import { TagEntity } from '../../models';
+import { AppScopes } from '../../shared/constants';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchTagDto } from '../dto/patch-tag.dto';
 import { UpdateTagDto } from '../dto/update-tag.dto';
 import { TagService } from '../services/tag.service';
-import { AppScopes } from '../../shared/constants';
 
 @ApiTags('Tags controller')
 @Resource('tag')
@@ -79,6 +79,7 @@ export class TagController {
     },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
   @Public()
   @Get('count')
   async count(
@@ -101,6 +102,7 @@ export class TagController {
   @ApiNotFoundResponse({ description: 'Any tag was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
+  @Scopes(AppScopes.READ)
   @Public()
   @Get(':id')
   public async findById(

@@ -30,7 +30,7 @@ import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { LoggedUserEntity } from '../models';
+import { LoggedUserModel } from '../models';
 import { ProfileService } from '../services/profile.service';
 
 @ApiTags('Profiles controller')
@@ -135,7 +135,7 @@ export class ProfileController {
   @Post()
   async create(
     @Body() profile: CreateProfileDto,
-    @LoggedUser() user: LoggedUserEntity,
+    @LoggedUser() user: LoggedUserModel,
   ): Promise<AppResponse<ProfileEntity>> {
     const newProfile = await this.profileService.create(profile, user);
 

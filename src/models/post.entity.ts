@@ -16,6 +16,7 @@ import { CategoryEntity } from './category.entity';
 import { CommentEntity } from './comment.entity';
 import { PostTagEntity } from './post-tag.entity';
 import { TagEntity } from './tag.entity';
+import { WrapperType } from '../shared/types/app.type';
 
 export interface IPostAttributes extends IBaseAttributes {
   title: string;
@@ -71,20 +72,22 @@ export class PostEntity extends BaseEntity<
   authorId: string;
 
   @BelongsTo(() => ProfileEntity)
-  author: ProfileEntity;
+  author: WrapperType<ProfileEntity>;
 
   @ApiProperty()
   @ForeignKey(() => CategoryEntity)
   categoryId: string;
 
   @BelongsTo(() => CategoryEntity)
-  category: CategoryEntity;
+  category: WrapperType<CategoryEntity>;
 
   @ApiProperty({ type: () => [TagExtendedModel] })
   @BelongsToMany(() => TagEntity, () => PostTagEntity)
-  tags: Array<TagEntity & { PostTagEntity: PostTagEntity }>;
+  tags: WrapperType<
+    TagEntity & { PostTagEntity: WrapperType<PostTagEntity> }
+  >[];
 
   @ApiProperty({ type: () => [CommentEntity] })
   @HasMany(() => CommentEntity)
-  comments: CommentEntity[];
+  comments: WrapperType<CommentEntity[]>;
 }

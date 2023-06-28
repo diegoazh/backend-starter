@@ -3,4 +3,4 @@ export const AppScopes = {
   READ: 'read',
   UPDATE: 'update',
   DELETE: 'delete',
-};
+} as const;

@@ -5,7 +5,7 @@ import { IKeycloakUser, IKeycloakUserQuery } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
 import { keycloakResponseChecker } from '../../shared/utils';
 import { CreateUserDto, PatchUserDto, UpdateUserDto } from '../dto';
-import { UserEntity } from '../models';
+import { UserModel } from '../models';
 
 @Injectable()
 export class UserService {
@@ -30,14 +30,14 @@ export class UserService {
     this.usersUrl = `${this.authServerUrl}/admin/realms/${this.realm}/users`;
   }
 
-  public async find(authorization: string): Promise<UserEntity[]> {
+  public async find(authorization: string): Promise<UserModel[]> {
     try {
       const res = await request(this.usersUrl, {
         headers: { ...this.defaultHeaders, authorization },
       });
       const users = await await keycloakResponseChecker<IKeycloakUser[]>(res);
 
-      return users.map((user) => new UserEntity(user));
+      return users.map((user) => new UserModel(user));
     } catch (error) {
       this.logger.error(`USER_FIND: ${error}`);
       throw error;
@@ -47,14 +47,14 @@ export class UserService {
   public async findById(
     id: string,
     authorization: string,
-  ): Promise<UserEntity | null> {
+  ): Promise<UserModel | null> {
     try {
       const res = await request(`${this.usersUrl}/${id}`, {
         headers: { ...this.defaultHeaders, authorization },
       });
       const newUserData = await keycloakResponseChecker<IKeycloakUser>(res);
 
-      return new UserEntity(newUserData);
+      return new UserModel(newUserData);
     } catch (error) {
       this.logger.error(`USER_FIND_BY_ID: ${error}`);
       throw error;
@@ -64,7 +64,7 @@ export class UserService {
   public async findOne(
     userData: IKeycloakUserQuery,
     authorization: string,
-  ): Promise<UserEntity[]> {
+  ): Promise<UserModel[]> {
     try {
       const query = qs.stringify(userData);
       this.logger.log(`Request URL: ${this.usersUrl}?${query}`);
@@ -73,7 +73,7 @@ export class UserService {
       });
       const result = await keycloakResponseChecker<IKeycloakUser[]>(res);
 
-      return result.map((value) => new UserEntity(value));
+      return result.map((value) => new UserModel(value));
     } catch (error) {
       this.logger.error(`USER_FIND_ONE: ${error}`);
       throw error;
@@ -97,7 +97,7 @@ export class UserService {
   public async create(
     data: CreateUserDto,
     authorization: string,
-  ): Promise<UserEntity | null> {
+  ): Promise<UserModel | null> {
     try {
       const { password, ...body } = data;
       let res = await request(this.usersUrl, {
@@ -125,7 +125,7 @@ export class UserService {
     id: string,
     data: UpdateUserDto,
     authorization: string,
-  ): Promise<UserEntity | undefined> {
+  ): Promise<UserModel | undefined> {
     try {
       const savedUser = await this.findById(id, authorization);
 
@@ -152,7 +152,7 @@ export class UserService {
     id: string,
     data: PatchUserDto,
     authorization: string,
-  ): Promise<UserEntity | undefined> {
+  ): Promise<UserModel | undefined> {
     try {
       const savedUser = await this.findById(id, authorization);
 

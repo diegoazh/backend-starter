@@ -58,12 +58,12 @@ export class CategoryService {
     id: string,
     data: CreateCategoryDto,
   ): Promise<CategoryEntity> {
-    const categoryFounded = await this.findById(id);
+    const categoryFound = await this.findById(id);
 
-    if (categoryFounded) {
-      categoryFounded.name = data.name;
+    if (categoryFound) {
+      categoryFound.name = data.name;
 
-      return categoryFounded.save();
+      return categoryFound.save();
     }
   }
 
@@ -71,21 +71,21 @@ export class CategoryService {
     id: string,
     data: PatchCategoryDto,
   ): Promise<CategoryEntity> {
-    const categoryFounded = await this.findById(id);
+    const categoryFound = await this.findById(id);
 
-    if (categoryFounded) {
+    if (categoryFound) {
       if (data.name) {
-        categoryFounded.name = data.name;
+        categoryFound.name = data.name;
       }
 
-      return categoryFounded.save();
+      return categoryFound.save();
     }
   }
 
   public async remove(id: string): Promise<{ deleted: number }> {
-    const categoryFounded = await this.findById(id);
+    const categoryFound = await this.findById(id);
 
-    if (!categoryFounded) {
+    if (!categoryFound) {
       throw new NotFoundException('category_exception_not_found');
     }
 

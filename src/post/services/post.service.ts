@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { PostEntity, ProfileEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
-import { LoggedUserEntity } from '../../user/models';
+import { LoggedUserModel } from '../../user/models';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -58,7 +58,7 @@ export class PostService {
 
   public create(
     { title, content = 'should be completed', type, published }: CreatePostDto,
-    loggedUser: LoggedUserEntity,
+    loggedUser: LoggedUserModel,
   ): Promise<PostEntity> {
     return this.Post.create({
       title,

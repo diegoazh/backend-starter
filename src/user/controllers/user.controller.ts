@@ -33,7 +33,7 @@ import errors from '../../../errors/errors_messages.json';
 import { AppScopes } from '../../shared/constants';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateUserDto, PatchUserDto, UpdateUserDto } from '../dto';
-import { UserEntity } from '../models';
+import { UserModel } from '../models';
 import { UserService } from '../services/user.service';
 
 @ApiTags('Users controller')
@@ -54,7 +54,7 @@ export class UserController {
           properties: {
             data: {
               type: 'array',
-              items: { $ref: getSchemaPath(UserEntity) },
+              items: { $ref: getSchemaPath(UserModel) },
             },
           },
         },
@@ -67,7 +67,7 @@ export class UserController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Scopes(AppScopes.READ)
   @Get()
-  async find(@Req() req: Request): Promise<AppPaginatedResponse<UserEntity[]>> {
+  async find(@Req() req: Request): Promise<AppPaginatedResponse<UserModel[]>> {
     try {
       const { authorization } = req.headers;
       const users = await this.userService.find(authorization);
@@ -123,7 +123,7 @@ export class UserController {
     description: 'A user object that match with the provided id',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(UserEntity) },
+        data: { $ref: getSchemaPath(UserModel) },
       },
     },
   })
@@ -137,7 +137,7 @@ export class UserController {
   async findById(
     @Req() req: Request,
     @Param('id') id: string,
-  ): Promise<AppResponse<UserEntity>> {
+  ): Promise<AppResponse<UserModel>> {
     try {
       const { authorization } = req.headers;
       const user = await this.userService.findById(id, authorization);
@@ -166,7 +166,7 @@ export class UserController {
     description: 'The user was created successfully',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(UserEntity) },
+        data: { $ref: getSchemaPath(UserModel) },
       },
     },
   })
@@ -180,7 +180,7 @@ export class UserController {
   async create(
     @Req() req: Request,
     @Body() data: CreateUserDto,
-  ): Promise<AppPaginatedResponse<UserEntity>> {
+  ): Promise<AppPaginatedResponse<UserModel>> {
     try {
       const { authorization } = req.headers;
       const user = await this.userService.create(data, authorization);
@@ -198,7 +198,7 @@ export class UserController {
     description: 'The user was overwrite successfully',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(UserEntity) },
+        data: { $ref: getSchemaPath(UserModel) },
       },
     },
   })
@@ -213,7 +213,7 @@ export class UserController {
     @Req() req: Request,
     @Param('id') id: string,
     @Body() user: UpdateUserDto,
-  ): Promise<AppResponse<UserEntity>> {
+  ): Promise<AppResponse<UserModel>> {
     try {
       const { authorization } = req.headers;
       const updatedUser = await this.userService.overwrite(
@@ -241,7 +241,7 @@ export class UserController {
     description: 'The properties of the user were updated successfully',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(UserEntity) },
+        data: { $ref: getSchemaPath(UserModel) },
       },
     },
   })
@@ -256,7 +256,7 @@ export class UserController {
     @Req() req: Request,
     @Param('id') id: string,
     user: PatchUserDto,
-  ): Promise<AppResponse<UserEntity>> {
+  ): Promise<AppResponse<UserModel>> {
     const { authorization } = req.headers;
     const updatedUser = await this.userService.update(id, user, authorization);
 

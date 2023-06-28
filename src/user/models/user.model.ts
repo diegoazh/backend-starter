@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IKeycloakUser } from '../../shared/interfaces';
 
-export class UserEntity implements IKeycloakUser {
+export class UserModel implements IKeycloakUser {
   @ApiProperty()
   public id: string;
 

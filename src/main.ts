@@ -10,8 +10,12 @@ import helmet from 'helmet';
 import { version } from '../package.json';
 import { AppModule } from './app.module';
 import { TagEntity } from './models';
-import { AppPaginatedResponse, AppResponse } from './shared/responses';
-import { LoggedUserEntity, UserEntity } from './user/models';
+import {
+  AppPaginatedResponse,
+  AppResponse,
+  PaginationLinks,
+} from './shared/responses';
+import { LoggedUserModel, UserModel } from './user/models';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -37,8 +41,9 @@ async function bootstrap(): Promise<void> {
     const options: SwaggerDocumentOptions = {
       extraModels: [
         TagEntity,
-        UserEntity,
-        LoggedUserEntity,
+        UserModel,
+        LoggedUserModel,
+        PaginationLinks,
         AppPaginatedResponse,
         AppResponse,
       ],

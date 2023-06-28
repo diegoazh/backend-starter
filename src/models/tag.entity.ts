@@ -5,6 +5,7 @@ import { PostExtendedModel } from '../shared/utils';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { PostTagEntity } from './post-tag.entity';
 import { PostEntity } from './post.entity';
+import { WrapperType } from '../shared/types';
 
 export interface ITagAttributes extends IBaseAttributes {
   name: string;
@@ -29,5 +30,5 @@ export class TagEntity extends BaseEntity<
     type: () => [PostExtendedModel],
   })
   @BelongsToMany(() => PostEntity, () => PostTagEntity)
-  posts: Array<PostEntity & { PostTagEntity: PostTagEntity }>;
+  posts: WrapperType<PostEntity & { PostTagEntity: PostTagEntity }>[];
 }

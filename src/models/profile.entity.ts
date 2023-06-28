@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Table } from 'sequelize-typescript';
+import { Column, HasMany, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
-import { BaseEntity, IBaseAttributes } from '.';
-import { LoggedUserEntity } from '../user/models';
+import { BaseEntity, CommentEntity, IBaseAttributes, PostEntity } from '.';
+import { LoggedUserModel } from '../user/models';
+import { WrapperType } from '../shared/types';
 
 export interface IProfileAttributes extends IBaseAttributes {
   image?: string;
@@ -46,9 +47,17 @@ export class ProfileEntity extends BaseEntity<
   @Column
   lastName?: string;
 
+  @ApiProperty({ type: () => [CommentEntity] })
+  @HasMany(() => CommentEntity)
+  comments: WrapperType<CommentEntity>[];
+
+  @ApiProperty({ type: () => [PostEntity] })
+  @HasMany(() => PostEntity)
+  posts: WrapperType<PostEntity>[];
+
   @ApiProperty()
   @Column
   userId: string;
 
-  user?: LoggedUserEntity;
+  user?: WrapperType<LoggedUserModel>;
 }
