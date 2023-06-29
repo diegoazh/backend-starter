@@ -6,6 +6,7 @@ import { CreateCategoryDto } from '../dto/create-category.dto';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
 import { TagService } from './tag.service';
+import { UpdateTagDto } from '../dto';
 
 const tagMock = {
   findAll: jest.fn(),
@@ -127,6 +128,9 @@ describe('TagService', () => {
       id,
       name: 'test',
       save: jest.fn(),
+      set: jest.fn((value: CreateTagDto) => {
+        oldCategory.name = value.name;
+      }),
     };
     const data: CreateTagDto = {
       name: 'test2',
@@ -177,6 +181,9 @@ describe('TagService', () => {
       id,
       name,
       save: jest.fn(),
+      set: jest.fn((value: UpdateTagDto) => {
+        oldTag.name = value.name;
+      }),
     };
     const data: PatchCategoryDto = {
       name: 'test2',

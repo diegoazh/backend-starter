@@ -5,6 +5,7 @@ import { NodeConfigService } from '../../shared/services/node-config.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
 import { CategoryService } from './category.service';
+import { UpdateCategoryDto } from '../dto';
 
 const categoryMock = {
   findAll: jest.fn(),
@@ -126,6 +127,9 @@ describe('CategoryService', () => {
       id,
       name: 'test',
       save: jest.fn(),
+      set: jest.fn((value: CreateCategoryDto) => {
+        oldCategory.name = value.name;
+      }),
     };
     const data: CreateCategoryDto = {
       name: 'test2',
@@ -176,6 +180,9 @@ describe('CategoryService', () => {
       id,
       name,
       save: jest.fn(),
+      set: jest.fn((value: UpdateCategoryDto) => {
+        oldCategory.name = value.name;
+      }),
     };
     const data: PatchCategoryDto = {
       name: 'test2',

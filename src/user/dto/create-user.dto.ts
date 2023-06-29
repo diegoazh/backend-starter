@@ -2,6 +2,7 @@ import {
   IsArray,
   IsBoolean,
   IsEmail,
+  IsLowercase,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -11,6 +12,7 @@ import {
 
 export class CreateUserDto {
   @IsEmail()
+  @IsLowercase()
   @IsString()
   @IsNotEmpty()
   email: string;
@@ -23,14 +25,17 @@ export class CreateUserDto {
 
   @MaxLength(32, { message: 'user_username_max_length' })
   @MinLength(4, { message: 'user_username_min_length' })
+  @IsLowercase()
   @IsString()
   @IsOptional()
   username?: string;
 
+  @IsLowercase()
   @IsString()
   @IsOptional()
   firstName?: string;
 
+  @IsLowercase()
   @IsString()
   @IsOptional()
   lastName?: string;

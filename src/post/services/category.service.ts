@@ -61,7 +61,7 @@ export class CategoryService {
     const categoryFound = await this.findById(id);
 
     if (categoryFound) {
-      categoryFound.name = data.name;
+      categoryFound.set({ ...data });
 
       return categoryFound.save();
     }
@@ -75,7 +75,7 @@ export class CategoryService {
 
     if (categoryFound) {
       if (data.name) {
-        categoryFound.name = data.name;
+        categoryFound.set({ name: data.name });
       }
 
       return categoryFound.save();

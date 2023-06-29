@@ -29,8 +29,11 @@ import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
 import { CategoryService } from '../services/category.service';
+import { Public, Resource, Scopes } from 'nest-keycloak-connect';
+import { AppScopes } from '../../shared/constants';
 
 @ApiTags('Categories controller')
+@Resource('category')
 @Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -52,6 +55,8 @@ export class CategoryController {
     },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
+  @Public()
   @Get()
   public async find(
     @Query() query?: IAppQueryString,
@@ -72,6 +77,8 @@ export class CategoryController {
     },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.READ)
+  @Public()
   @Get('count')
   async count(
     @Query()
@@ -93,6 +100,8 @@ export class CategoryController {
   @ApiNotFoundResponse({ description: 'Any category was found' })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
+  @Scopes(AppScopes.READ)
+  @Public()
   @Get(':id')
   public async findById(
     @Param('id') id: string,
@@ -121,6 +130,7 @@ export class CategoryController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.CREATE)
   @Post()
   public async create(
     @Body() categoryData: CreateCategoryDto,
@@ -142,6 +152,7 @@ export class CategoryController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.UPDATE)
   @Put(':id')
   public async overwrite(
     @Param('id') id: string,
@@ -167,6 +178,7 @@ export class CategoryController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.UPDATE)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -189,6 +201,7 @@ export class CategoryController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.DELETE)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.categoryService.remove(id);
