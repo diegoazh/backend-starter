@@ -7,7 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { PostType } from '../constants/post.constant';
+import { PostType } from '../constants/blog.constant';
 
 export class CreatePostDto {
   @MaxLength(80)

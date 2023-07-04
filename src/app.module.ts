@@ -11,7 +11,7 @@ import {
 import dbConfig from '../config/db.config';
 import { KeycloakModule } from './keycloak/keycloak.module';
 import * as models from './models';
-import { PostsModule } from './post/posts.module';
+import { BlogModule } from './blog/blog.module';
 import { KeycloakConfigService } from './shared/services';
 import { SharedModule } from './shared/shared.module';
 import { UsersModule } from './user/users.module';
@@ -40,7 +40,7 @@ import { UsersModule } from './user/users.module';
     SharedModule,
     KeycloakModule,
     UsersModule,
-    PostsModule,
+    BlogModule,
   ],
   providers: [
     {

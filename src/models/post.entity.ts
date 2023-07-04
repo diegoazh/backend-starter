@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript';
 import { Optional } from 'sequelize/types';
 import { BaseEntity, IBaseAttributes, ProfileEntity } from '.';
-import { PostType } from '../post/constants/post.constant';
+import { PostType } from '../blog/constants/blog.constant';
 import { TagExtendedModel } from '../shared/utils';
 import { CategoryEntity } from './category.entity';
 import { CommentEntity } from './comment.entity';

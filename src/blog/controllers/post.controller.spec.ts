@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthenticatedRequest } from 'src/auth/types/authenticated-request.type';
 import { mockServiceFactory } from '../../../test/utils/utils';
-import { PostType } from '../constants/post.constant';
+import { PostType } from '../constants/blog.constant';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';

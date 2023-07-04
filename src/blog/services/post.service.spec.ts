@@ -2,7 +2,7 @@ import { getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostEntity, ProfileEntity, UserEntity } from '../../models';
 import { NodeConfigService } from '../../shared/services/node-config.service';
-import { PostType } from '../constants/post.constant';
+import { PostType } from '../constants/blog.constant';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
