@@ -1,0 +1,161 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+interface RealmAccessProp {
+  roles: [String!]!
+}
+
+interface UserAccessProp {
+  manageGroupMembership: Boolean!
+  view: Boolean!
+  mapRoles: Boolean!
+  impersonate: Boolean!
+  manage: Boolean!
+}
+
+interface PostTagEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  postId: String!
+  tagId: String!
+}
+
+interface BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+}
+
+type LoggedUserModel {
+  exp: Int!
+  iat: Int!
+  auth_time: Int!
+  jti: String!
+  iss: String!
+  aud: String!
+  sub: String!
+  typ: String!
+  azp: String!
+  session_state: String!
+  acr: String!
+  allowed_origins: [String!]!
+  realm_access: RealmAccessProp!
+  scope: String!
+  sid: String!
+  email_verified: Boolean!
+  name: String!
+  preferred_username: String!
+  given_name: String!
+  family_name: String!
+
+  """
+  the id of logged user. It was called id to be more intuitive but is the same as sub property
+  """
+  id: String!
+}
+
+type UserModel {
+  id: ID!
+  createdTimestamp: Int!
+  username: String!
+  enabled: Boolean!
+  totp: Boolean!
+  email: String!
+  emailVerified: Boolean!
+  firstName: String!
+  lastName: String!
+  disableableCredentialTypes: [String!]!
+  requiredActions: [String!]!
+  notBefore: Int!
+  access: UserAccessProp!
+}
+
+type ProfileEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  image: String
+  bio: String
+  firstName: String
+  lastName: String
+  comments: [CommentEntity!]!
+  posts: [PostEntity!]!
+  userId: String!
+  user: LoggedUserModel
+}
+
+type CommentEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  content: String!
+  authorId: String!
+  author: ProfileEntity
+  postId: String!
+  post: PostEntity
+}
+
+type TagEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  name: String!
+  posts: [PostEntity!]!
+  PostTagEntity: PostTagEntity
+}
+
+type PostEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  title: String!
+  content: String!
+  mainImage: String!
+  images: String
+  type: PostType!
+  published: Boolean!
+  authorId: String!
+  author: ProfileEntity
+  categoryId: String!
+  category: CategoryEntity
+  tags: [TagEntity!]!
+  comments: [CommentEntity!]!
+  PostTagEntity: PostTagEntity
+}
+
+enum PostType {
+  TEXT
+  GALLERY
+  PAGE
+}
+
+type CategoryEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  name: String!
+  parentId: String
+  parent: CategoryEntity
+  subcategories: [CategoryEntity!]!
+  posts: [PostEntity!]!
+}
+
+type Query {
+  """Returns a list of users"""
+  users: [UserModel!]!
+
+  """Returns a user"""
+  user(id: ID!): UserModel!
+
+  """Returns the total count of all users"""
+  usersCount: Int!
+}
