@@ -17,4 +17,4 @@ import { TagService } from './services/tag.service';
   controllers: [TagController, CategoryController, PostController],
   providers: [PostService, CategoryService, TagService],
 })
-export class PostsModule {}
+export class BlogModule {}

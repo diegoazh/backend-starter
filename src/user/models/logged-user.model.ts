@@ -1,46 +1,74 @@
+import { Field, Int, InterfaceType, ObjectType } from '@nestjs/graphql';
 import { IKeycloakLoggedUserEntity } from '../../shared/interfaces';
 
+@InterfaceType()
+export abstract class RealmAccessProp {
+  @Field(() => [String]!)
+  roles: string[];
+}
+
+@ObjectType()
 export class LoggedUserModel implements IKeycloakLoggedUserEntity {
+  @Field(() => Int)
   exp: number;
 
+  @Field(() => Int)
   iat: number;
 
+  @Field(() => Int)
   auth_time: number;
 
+  @Field(() => String)
   jti: string;
 
+  @Field(() => String)
   iss: string;
 
+  @Field(() => String)
   aud: string;
 
+  @Field(() => String)
   sub: string;
 
+  @Field(() => String)
   typ: string;
 
+  @Field(() => String)
   azp: string;
 
+  @Field(() => String)
   session_state: string;
 
+  @Field(() => String)
   acr: string;
 
+  @Field(() => [String]!, { name: 'allowed_origins' })
   'allowed-origins': string[];
 
-  realm_access: { roles: string[] };
+  @Field(() => RealmAccessProp)
+  realm_access: RealmAccessProp;
 
   resource_access: { [key: string]: { roles: string[] } };
 
+  @Field(() => String)
   scope: string;
 
+  @Field(() => String)
   sid: string;
 
+  @Field(() => Boolean)
   email_verified: boolean;
 
+  @Field(() => String)
   name: string;
 
+  @Field(() => String)
   preferred_username: string;
 
+  @Field(() => String)
   given_name: string;
 
+  @Field(() => String)
   family_name: string;
 
   constructor(data: IKeycloakLoggedUserEntity) {
@@ -69,6 +97,10 @@ export class LoggedUserModel implements IKeycloakLoggedUserEntity {
     } = data);
   }
 
+  @Field(() => String, {
+    description:
+      'the id of logged user. It was called id to be more intuitive but is the same as sub property',
+  })
   get id(): string {
     return this.sub;
   }

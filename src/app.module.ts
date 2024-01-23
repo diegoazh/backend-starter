@@ -1,6 +1,8 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { GraphQLModule } from '@nestjs/graphql';
 import { SequelizeModule } from '@nestjs/sequelize';
 import {
   AuthGuard,
@@ -8,10 +10,11 @@ import {
   ResourceGuard,
   RoleGuard,
 } from 'nest-keycloak-connect';
+import { join } from 'path';
 import dbConfig from '../config/db.config';
+import { BlogModule } from './blog/blog.module';
 import { KeycloakModule } from './keycloak/keycloak.module';
 import * as models from './models';
-import { PostsModule } from './post/posts.module';
 import { KeycloakConfigService } from './shared/services';
 import { SharedModule } from './shared/shared.module';
 import { UsersModule } from './user/users.module';
@@ -37,10 +40,14 @@ import { UsersModule } from './user/users.module';
       autoLoadModels: true,
       synchronize: true,
     }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
     SharedModule,
     KeycloakModule,
     UsersModule,
-    PostsModule,
+    BlogModule,
   ],
   providers: [
     {

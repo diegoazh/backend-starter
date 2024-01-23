@@ -27,7 +27,41 @@ async function bootstrap(): Promise<void> {
   //   origin: JSON.parse(configService.get<string>('APP_CORS_ORIGIN')),
   // });
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        process.env.NODE_ENV !== 'production'
+          ? false
+          : {
+              directives: {
+                'img-src': [
+                  'self',
+                  'unsafe-inline',
+                  'data:',
+                  'cdn.jsdelivr.net',
+                ],
+                'script-src': [
+                  'self',
+                  'unsafe-inline',
+                  'https://cdn.jsdelivr.net',
+                ],
+                'script-src-elem': [
+                  'self',
+                  'unsafe-inline',
+                  'https://cdn.jsdelivr.net',
+                ],
+                'style-src': ['self', 'unsafe-inline'],
+                'style-src-elem': [
+                  'self',
+                  'unsafe-inline',
+                  'https://fonts.googleapis.com https://cdn.jsdelivr.net',
+                ],
+                'font-src': ['self', 'https://fonts.gstatic.com'],
+                'default-src': ['self', 'unsafe-inline'],
+              },
+            },
+    }),
+  );
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   if (process.env.NODE_ENV !== 'production') {

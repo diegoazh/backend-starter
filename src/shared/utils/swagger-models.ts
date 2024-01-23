@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IPostAttributes, ITagAttributes, PostTagEntity } from '../../models';
-import { PostType } from '../../post/constants/post.constant';
+import { PostType } from '../../blog/constants/blog.constant';
 import { WrapperType } from '../types';
 
 export class TagExtendedModel implements ITagAttributes {

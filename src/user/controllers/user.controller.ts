@@ -30,15 +30,16 @@ import {
 import { Request } from 'express';
 import { Resource, Scopes } from 'nest-keycloak-connect';
 import errors from '../../../errors/errors_messages.json';
-import { AppScopes } from '../../shared/constants';
+import { AppResources, AppScopes } from '../../shared/constants';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateUserDto, PatchUserDto, UpdateUserDto } from '../dto';
 import { UserModel } from '../models';
 import { UserService } from '../services/user.service';
+import { parseErrorsToHttpErrors } from '../../shared/utils';
 
 @ApiTags('Users controller')
 @ApiBearerAuth()
-@Resource('user')
+@Resource(AppResources.USER)
 @Controller('users')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
@@ -151,14 +152,7 @@ export class UserController {
 
       return { data: user };
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException(error.message, {
-        cause: error,
-        description: errors.internal_server_error,
-      });
+      throw parseErrorsToHttpErrors(error);
     }
   }
 

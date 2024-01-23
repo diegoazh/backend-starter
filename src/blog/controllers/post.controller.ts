@@ -25,7 +25,7 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { Resource, Scopes } from 'nest-keycloak-connect';
+import { Public, Resource, Scopes } from 'nest-keycloak-connect';
 import { PostEntity } from '../../models';
 import { AppScopes } from '../../shared/constants';
 import { LoggedUser } from '../../shared/decorators';
@@ -66,8 +66,8 @@ export class PostController {
     },
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
-  // @Roles({ roles: ['admin'] })
   @Scopes(AppScopes.READ)
+  @Public()
   @Get()
   async find(
     @Query() query?: IAppQueryString,
@@ -89,6 +89,7 @@ export class PostController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Scopes(AppScopes.READ)
+  @Public()
   @Get('count')
   async count(
     @Query()
@@ -111,6 +112,7 @@ export class PostController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
   @Scopes(AppScopes.READ)
+  @Public()
   @Get(':id')
   async findById(@Param('id') id: string): Promise<AppResponse<PostEntity>> {
     const post = await this.postService.findById(id);
@@ -137,6 +139,7 @@ export class PostController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.CREATE)
   @Post()
   async create(
     @Body() postData: CreatePostDto,
@@ -159,6 +162,7 @@ export class PostController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.UPDATE)
   @Put(':id')
   async overwrite(
     @Param('id') id: string,
@@ -181,6 +185,7 @@ export class PostController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.UPDATE)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -203,6 +208,7 @@ export class PostController {
     description: 'When hit the endpoint without a valid login',
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
+  @Scopes(AppScopes.DELETE)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.postService.remove(id);

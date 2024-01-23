@@ -1,3 +1,4 @@
+import { Field, ID, InterfaceType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
@@ -15,8 +16,10 @@ export interface IBaseAttributes {
   deletedAt: Date;
 }
 
+@InterfaceType()
 export abstract class BaseEntity<T, U> extends Model<T, U> {
   @ApiProperty()
+  @Field(() => ID!)
   @Column({
     primaryKey: true,
     allowNull: false,
@@ -26,14 +29,17 @@ export abstract class BaseEntity<T, U> extends Model<T, U> {
   id: string;
 
   @ApiProperty()
+  @Field(() => String!)
   @CreatedAt
   createdAt: Date;
 
   @ApiProperty()
+  @Field(() => String)
   @UpdatedAt
   updatedAt: Date;
 
   @ApiProperty()
+  @Field(() => String)
   @DeletedAt
   deletedAt: Date;
 }

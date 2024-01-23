@@ -35,7 +35,7 @@ export class UserService {
       const res = await request(this.usersUrl, {
         headers: { ...this.defaultHeaders, authorization },
       });
-      const users = await await keycloakResponseChecker<IKeycloakUser[]>(res);
+      const users = await keycloakResponseChecker<IKeycloakUser[]>(res);
 
       return users.map((user) => new UserModel(user));
     } catch (error) {

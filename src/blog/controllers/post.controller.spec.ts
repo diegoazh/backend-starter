@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthenticatedRequest } from 'src/auth/types/authenticated-request.type';
 import { mockServiceFactory } from '../../../test/utils/utils';
-import { PostType } from '../constants/post.constant';
+import { LoggedUserModel } from '../../user/models';
+import { PostType } from '../constants/blog.constant';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -65,9 +65,9 @@ describe('PostController', () => {
 
   it('should call postService.create with provided args when receive a POST HTTP request on /posts', async () => {
     // Arrange
-    const req = {
+    const user = {
       user: { id: 'abcd-efgh-ijkl-mnop' },
-    } as unknown as AuthenticatedRequest;
+    } as unknown as LoggedUserModel;
     const post: CreatePostDto = {
       title:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sagittis.',
@@ -78,11 +78,11 @@ describe('PostController', () => {
     };
 
     // Act
-    await controller.create(post, req);
+    await controller.create(post, user);
 
     // Assert
     expect(postService.create).toHaveBeenCalledTimes(1);
-    expect(postService.create).toHaveBeenCalledWith(post, req.user);
+    expect(postService.create).toHaveBeenCalledWith(post, user);
   });
 
   it('should call postService.overwrite with provided args when receive a PUT HTTP request on /posts/:id', async () => {
