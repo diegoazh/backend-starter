@@ -99,8 +99,8 @@ dependencies:
     specifier: ^4.6.3
     version: 4.6.3(express@4.18.2)
   undici:
-    specifier: ^5.22.1
-    version: 5.22.1
+    specifier: ^5.26.2
+    version: 5.26.2
 
 devDependencies:
   '@commitlint/cli':
@@ -1024,6 +1024,11 @@ packages:
   /@faker-js/faker@8.0.2:
     resolution: {integrity: sha512-Uo3pGspElQW91PCvKSIAXoEgAUlRnH29sX2/p89kg7sP1m2PzCufHINd0FhTXQf6DYGiUlVncdSPa2F9wxed2A==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
+    dev: false
+
+  /@fastify/busboy@2.1.0:
+    resolution: {integrity: sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==}
+    engines: {node: '>=14'}
     dev: false
 
   /@graphql-tools/merge@8.4.2(graphql@16.7.1):
@@ -2015,8 +2020,8 @@ packages:
       defer-to-connect: 2.0.1
     dev: true
 
-  /@testim/chrome-version@1.1.3:
-    resolution: {integrity: sha512-g697J3WxV/Zytemz8aTuKjTGYtta9+02kva3C1xc7KXB8GdbfE1akGJIsZLyY/FSh2QrnE+fiB7vmWU3XNcb6A==}
+  /@testim/chrome-version@1.1.4:
+    resolution: {integrity: sha512-kIhULpw9TrGYnHp/8VfdcneIcxKnLixmADtukQRtJUmsVlMg0niMkwV0xZmi8hqa57xqilIHjWFA0GKvEjVU5g==}
     requiresBuild: true
     dev: false
     optional: true
@@ -2917,11 +2922,11 @@ packages:
     hasBin: true
     dev: true
 
-  /axios@1.4.0:
-    resolution: {integrity: sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==}
+  /axios@1.6.5:
+    resolution: {integrity: sha512-Ii012v05KEVuUoFWmMW/UQv9aRIc3ZwkWDcM+h5Il8izZCtRVpDUfwpoFf7eOtajT3QiGR4yDUx7lPqHJULgbg==}
     requiresBuild: true
     dependencies:
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.5
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -3371,14 +3376,14 @@ packages:
     engines: {node: '>=6.0'}
     dev: true
 
-  /chromedriver@116.0.0:
-    resolution: {integrity: sha512-/TQaRn+RUAYnVqy5Vx8VtU8DvtWosU8QLM2u7BoNM5h55PRQPXF/onHAehEi8Sj/CehdKqH50NFdiumQAUr0DQ==}
-    engines: {node: '>=16'}
+  /chromedriver@120.0.2:
+    resolution: {integrity: sha512-A6/feXNWoKzkoUISJs/JAi0iIa+t6vwUnQCgGGFK7L/1r7CrreaRynVgnIliQJRdwY/8F41r6Mt3WDD9QXdV8A==}
+    engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@testim/chrome-version': 1.1.3
-      axios: 1.4.0
+      '@testim/chrome-version': 1.1.4
+      axios: 1.6.5
       compare-versions: 6.1.0
       extract-zip: 2.0.1
       https-proxy-agent: 5.0.1
@@ -4909,8 +4914,8 @@ packages:
     resolution: {integrity: sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==}
     dev: true
 
-  /follow-redirects@1.15.2:
-    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
+  /follow-redirects@1.15.5:
+    resolution: {integrity: sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==}
     engines: {node: '>=4.0'}
     requiresBuild: true
     peerDependencies:
@@ -6576,7 +6581,7 @@ packages:
     dependencies:
       jwk-to-pem: 2.0.5
     optionalDependencies:
-      chromedriver: 116.0.0
+      chromedriver: 120.0.2
     transitivePeerDependencies:
       - debug
       - supports-color
@@ -9271,11 +9276,11 @@ packages:
     resolution: {integrity: sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==}
     dev: false
 
-  /undici@5.22.1:
-    resolution: {integrity: sha512-Ji2IJhFXZY0x/0tVBXeQwgPlLWw13GVzpsWPQ3rV50IFMMof2I55PZZxtm4P6iNq+L5znYN9nSTAq0ZyE6lSJw==}
+  /undici@5.26.2:
+    resolution: {integrity: sha512-a4PDLQgLTPHVzOK+x3F79/M4GtyYPl+aX9AAK7aQxpwxDwCqkeZCScy7Gk5kWT3JtdFq1uhO3uZJdLtHI4dK9A==}
     engines: {node: '>=14.0'}
     dependencies:
-      busboy: 1.6.0
+      '@fastify/busboy': 2.1.0
     dev: false
 
   /union-value@1.0.1:
