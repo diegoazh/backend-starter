@@ -99,8 +99,8 @@ dependencies:
     specifier: ^4.6.3
     version: 4.6.3(express@4.18.2)
   undici:
-    specifier: ^5.26.2
-    version: 5.26.2
+    specifier: ^5.28.3
+    version: 5.28.3
 
 devDependencies:
   '@commitlint/cli':
@@ -3441,8 +3441,8 @@ packages:
     engines: {node: '>=6.0'}
     dev: true
 
-  /chromedriver@120.0.2:
-    resolution: {integrity: sha512-A6/feXNWoKzkoUISJs/JAi0iIa+t6vwUnQCgGGFK7L/1r7CrreaRynVgnIliQJRdwY/8F41r6Mt3WDD9QXdV8A==}
+  /chromedriver@121.0.1:
+    resolution: {integrity: sha512-7y/RLV3tKNpNf/Ye74eOF7gyrCA78qq3i6JjrMJ4xovc2XZaw4a3cZA6+2PflGX/0HttYiKJV2WO611JROGNaw==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
@@ -6640,7 +6640,7 @@ packages:
     dependencies:
       jwk-to-pem: 2.0.5
     optionalDependencies:
-      chromedriver: 120.0.2
+      chromedriver: 121.0.1
     transitivePeerDependencies:
       - debug
       - supports-color
@@ -9328,8 +9328,8 @@ packages:
     resolution: {integrity: sha512-+A5Sja4HP1M08MaXya7p5LvjuM7K6q/2EaC0+iovj/wOcMsTzMvDFbasi/oSapiwOlt252IqsKqPjCl7huKS0A==}
     dev: false
 
-  /undici@5.26.2:
-    resolution: {integrity: sha512-a4PDLQgLTPHVzOK+x3F79/M4GtyYPl+aX9AAK7aQxpwxDwCqkeZCScy7Gk5kWT3JtdFq1uhO3uZJdLtHI4dK9A==}
+  /undici@5.28.3:
+    resolution: {integrity: sha512-3ItfzbrhDlINjaP0duwnNsKpDQk3acHI3gVJ1z4fmwMK31k5G9OVIAMLSIaP6w4FaGkaAkN6zaQO9LUvZ1t7VA==}
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.1.0
