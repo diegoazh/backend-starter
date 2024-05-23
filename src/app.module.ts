@@ -48,6 +48,7 @@ import { UsersModule } from './user/users.module';
     KeycloakModule,
     UsersModule,
     BlogModule,
+    ECommerceModule,
   ],
   providers: [
     {
