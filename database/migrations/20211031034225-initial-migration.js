@@ -5,7 +5,9 @@ module.exports = {
 
     try {
       // const userRoles = ['USER', 'ADMIN'];
-      const postTypes = ['TEXT', 'GALLERY'];
+      const PostTypes = ['TEXT', 'GALLERY'];
+      const ProductSize = ['BIG', 'MEDIUM', 'SMALL'];
+      const ProductStatus = ['PENDING', 'IN_PROGRESS', 'FINISHED'];
 
       // await queryInterface.createTable(
       //   'Users',
@@ -184,7 +186,7 @@ module.exports = {
             allowNull: false,
           },
           mainImage: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(1500),
             allowNull: false,
           },
           images: {
@@ -193,8 +195,8 @@ module.exports = {
           },
           type: {
             type: Sequelize.ENUM,
-            values: postTypes,
-            default: postTypes[0],
+            values: PostTypes,
+            default: PostTypes[0],
           },
           published: {
             type: Sequelize.BOOLEAN,
@@ -283,7 +285,7 @@ module.exports = {
             allowNull: false,
           },
           content: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(2000),
             allowNull: false,
           },
           authorId: {
@@ -318,6 +320,99 @@ module.exports = {
         { transaction },
       );
 
+      await queryInterface.createTable(
+        'ProductCategories',
+        {
+          id: {
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true,
+            allowNull: false,
+          },
+          name: {
+            type: Sequelize.STRING(80),
+            allowNull: false,
+          },
+          profit: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            default: 0,
+          },
+          createdAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          updatedAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          deletedAt: {
+            allowNull: true,
+            type: Sequelize.DATE,
+          },
+        },
+        { transaction },
+      );
+
+      await queryInterface.createTable(
+        'Products',
+        {
+          id: {
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true,
+            allowNull: false,
+          },
+          name: {
+            type: Sequelize.STRING(1000),
+            allowNull: false,
+          },
+          images: {
+            type: Sequelize.STRING(3000),
+            allowNull: true,
+          },
+          size: {
+            type: Sequelize.ENUM,
+            values: ProductSize,
+          },
+          description: {
+            type: Sequelize.STRING(3000),
+            allowNull: true,
+          },
+          available: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+          },
+          status: {
+            type: Sequelize.ENUM,
+            values: ProductStatus,
+            default: null,
+            allowNull: true,
+          },
+          productCategoryId: {
+            type: Sequelize.UUID,
+            references: {
+              model: 'ProductCategories',
+              key: 'id',
+            },
+            onDelete: 'SET NULL',
+          },
+          createdAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          updatedAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          deletedAt: {
+            allowNull: true,
+            type: Sequelize.DATE,
+          },
+        },
+        { transaction },
+      );
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -330,6 +425,8 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
 
     try {
+      await queryInterface.dropTable('Products', { transaction });
+      await queryInterface.dropTable('ProductCategories', { transaction });
       await queryInterface.dropTable('Comments', { transaction });
       await queryInterface.dropTable('PostsTags', { transaction });
       await queryInterface.dropTable('Posts', { transaction });
