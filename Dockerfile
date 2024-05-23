@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Development mode
-FROM node:16-bullseye
+FROM node:20-bullseye
 
 # labels
 LABEL name="starter-nestjs"
