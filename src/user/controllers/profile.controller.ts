@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   NotFoundException,
   Param,
   Patch,
@@ -32,10 +33,13 @@ import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { LoggedUserModel } from '../models';
 import { ProfileService } from '../services/profile.service';
+import { parseErrorsToHttpErrors } from '../../shared/utils';
 
 @ApiTags('Profiles controller')
 @Controller('profiles')
 export class ProfileController {
+  private readonly logger = new Logger('ProfileController');
+
   constructor(private readonly profileService: ProfileService) {}
 
   @ApiOkResponse({
@@ -59,7 +63,7 @@ export class ProfileController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get()
-  async find(
+  public async find(
     @Query() query?: IAppQueryString,
   ): Promise<AppResponse<ProfileEntity[]>> {
     const profiles = await this.profileService.find(query);
@@ -82,7 +86,7 @@ export class ProfileController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Get('count')
-  async count(
+  public async count(
     @Query()
     query?: IAppQueryString,
   ): Promise<AppResponse<number>> {
@@ -106,14 +110,21 @@ export class ProfileController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.FOUND)
   @Get(':id')
-  async findById(@Param('id') id: string): Promise<AppResponse<ProfileEntity>> {
-    const profile = await this.profileService.findById(id);
+  public async findById(
+    @Param('id') id: string,
+  ): Promise<AppResponse<ProfileEntity>> {
+    try {
+      const profile = await this.profileService.findById(id);
 
-    if (!profile) {
-      throw new NotFoundException('profile_exception_not_found');
+      if (!profile) {
+        throw new NotFoundException('profile_exception_not-found');
+      }
+
+      return { data: profile.toJSON() };
+    } catch (error) {
+      this.logger.error(`PROFILE_BY_ID: ${error}`);
+      throw parseErrorsToHttpErrors(error);
     }
-
-    return { data: profile.toJSON() };
   }
 
   @ApiCreatedResponse({
@@ -133,13 +144,18 @@ export class ProfileController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  async create(
+  public async create(
     @Body() profile: CreateProfileDto,
     @LoggedUser() user: LoggedUserModel,
   ): Promise<AppResponse<ProfileEntity>> {
-    const newProfile = await this.profileService.create(profile, user);
+    try {
+      const newProfile = await this.profileService.create(profile, user);
 
-    return { data: newProfile.toJSON() };
+      return { data: newProfile.toJSON() };
+    } catch (error) {
+      this.logger.error(`PROFILE_CREATE: ${error}`);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 
   @ApiOkResponse({
@@ -155,7 +171,7 @@ export class ProfileController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Put(':id')
-  async overwrite(
+  public async overwrite(
     @Param('id') id: string,
     @Body() profile: UpdateProfileDto,
   ): Promise<AppResponse<ProfileEntity>> {
@@ -177,7 +193,7 @@ export class ProfileController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Patch(':id')
-  async update(
+  public async update(
     @Param('id') id: string,
     profile: PatchProfileDto,
   ): Promise<AppResponse<ProfileEntity>> {
@@ -199,7 +215,7 @@ export class ProfileController {
   })
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<AppResponse<number>> {
+  public async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     const { deleted } = await this.profileService.remove(id);
 
     return { data: deleted };

@@ -4,9 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
   Param,
@@ -32,10 +30,10 @@ import { Resource, Scopes } from 'nest-keycloak-connect';
 import errors from '../../../errors/errors_messages.json';
 import { AppResources, AppScopes } from '../../shared/constants';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
+import { parseErrorsToHttpErrors } from '../../shared/utils';
 import { CreateUserDto, PatchUserDto, UpdateUserDto } from '../dto';
 import { UserModel } from '../models';
 import { UserService } from '../services/user.service';
-import { parseErrorsToHttpErrors } from '../../shared/utils';
 
 @ApiTags('Users controller')
 @ApiBearerAuth()
@@ -75,14 +73,8 @@ export class UserController {
 
       return { data: users };
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException(error.message, {
-        cause: error,
-        description: errors.internal_server_error,
-      });
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
     }
   }
 
@@ -109,14 +101,8 @@ export class UserController {
 
       return { data: count };
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException(error.message, {
-        cause: error,
-        description: errors.internal_server_error,
-      });
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
     }
   }
 
@@ -144,14 +130,15 @@ export class UserController {
       const user = await this.userService.findById(id, authorization);
 
       if (!user) {
-        throw new NotFoundException(errors.user_not_found, {
-          cause: new Error(errors.user_not_found),
-          description: errors.user_not_found,
+        throw new NotFoundException(errors['user_exception_not-found'], {
+          cause: new Error(errors['user_exception_not-found']),
+          description: errors['user_exception_not-found'],
         });
       }
 
       return { data: user };
     } catch (error) {
+      this.logger.error(error);
       throw parseErrorsToHttpErrors(error);
     }
   }
@@ -181,10 +168,7 @@ export class UserController {
       return { data: user };
     } catch (error) {
       this.logger.error(error);
-      throw new InternalServerErrorException(error.message, {
-        cause: error,
-        description: errors.user_can_not_be_created,
-      });
+      throw parseErrorsToHttpErrors(error);
     }
   }
 
@@ -219,15 +203,7 @@ export class UserController {
       return { data: updatedUser };
     } catch (error) {
       this.logger.error(error);
-
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException(error.message, {
-        cause: error,
-        description: errors.internal_server_error,
-      });
+      throw parseErrorsToHttpErrors(error);
     }
   }
 
@@ -251,10 +227,19 @@ export class UserController {
     @Param('id') id: string,
     user: PatchUserDto,
   ): Promise<AppResponse<UserModel>> {
-    const { authorization } = req.headers;
-    const updatedUser = await this.userService.update(id, user, authorization);
+    try {
+      const { authorization } = req.headers;
+      const updatedUser = await this.userService.update(
+        id,
+        user,
+        authorization,
+      );
 
-    return { data: updatedUser };
+      return { data: updatedUser };
+    } catch (error) {
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 
   @ApiNoContentResponse({
@@ -272,14 +257,8 @@ export class UserController {
       const { authorization } = req.headers;
       await this.userService.remove(id, authorization);
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException(error.message, {
-        cause: error,
-        description: errors.internal_server_error,
-      });
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
     }
   }
 }
