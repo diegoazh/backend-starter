@@ -9,6 +9,7 @@
 !/docker/nginx/certificates/self-signed/cert.conf
 !/docker/nginx/certificates/self-signed/.generate-certificates
 /src/metadata.ts
+/.data
 
 # Logs
 logs
