@@ -94,6 +94,7 @@ async function bootstrap(): Promise<void> {
 
   if (process.env.NODE_ENV !== 'production') {
     logger.log(`OpenAPI documentation  listen on ${uri}/api`);
+    logger.log(`GraphiQL is running on ${uri}/graphql`);
   }
 }
 bootstrap();

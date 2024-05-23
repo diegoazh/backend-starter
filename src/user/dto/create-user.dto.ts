@@ -1,3 +1,4 @@
+import { Field, InputType } from '@nestjs/graphql';
 import {
   IsArray,
   IsBoolean,
@@ -10,48 +11,58 @@ import {
   MinLength,
 } from 'class-validator';
 
+@InputType({ description: 'Data needed to create a new user' })
 export class CreateUserDto {
+  @Field()
   @IsEmail()
   @IsLowercase()
   @IsString()
   @IsNotEmpty()
   email: string;
 
-  @MaxLength(32, { message: 'user_pwd_max_length' })
-  @MinLength(8, { message: 'user_pwd_min_length' })
+  @Field()
+  @MaxLength(32, { message: 'user_pwd_max-length' })
+  @MinLength(8, { message: 'user_pwd_min-length' })
   @IsString()
   @IsNotEmpty()
   password: string;
 
-  @MaxLength(32, { message: 'user_username_max_length' })
-  @MinLength(4, { message: 'user_username_min_length' })
+  @Field({ nullable: true })
+  @MaxLength(32, { message: 'user_username_max-length' })
+  @MinLength(4, { message: 'user_username_min-length' })
   @IsLowercase()
   @IsString()
   @IsOptional()
   username?: string;
 
+  @Field({ nullable: true })
   @IsLowercase()
   @IsString()
   @IsOptional()
   firstName?: string;
 
+  @Field({ nullable: true })
   @IsLowercase()
   @IsString()
   @IsOptional()
   lastName?: string;
 
+  @Field(() => [String!], { nullable: true })
   @IsArray()
   @IsOptional()
-  requiredActions?: any[]; // TODO: fix this any type and the IsArray decorator
+  requiredActions?: string[]; // TODO: change this to an enum type
 
+  @Field({ nullable: true })
   @IsBoolean()
   @IsOptional()
   emailVerified?: boolean;
 
+  @Field(() => [String!], { nullable: true })
   @IsArray()
   @IsOptional()
-  groups?: any[];
+  groups?: string[]; // TODO: change this to an enum type
 
+  @Field({ nullable: true })
   @IsBoolean()
   @IsOptional()
   enabled?: boolean;

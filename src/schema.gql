@@ -149,13 +149,140 @@ type CategoryEntity implements BaseEntity {
   posts: [PostEntity!]!
 }
 
+type ProductCategoryEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  name: String!
+  profit: Float!
+  products: [ProductEntity!]!
+}
+
+type ProductEntity implements BaseEntity {
+  id: ID!
+  createdAt: String!
+  updatedAt: String!
+  deletedAt: String!
+  name: String!
+  images: String!
+  size: ProductSize!
+  description: String!
+  available: Boolean!
+  status: ProductStatus!
+  productCategoryId: String!
+  productCategory: ProductCategoryEntity
+}
+
+enum ProductSize {
+  BIG
+  MEDIUM
+  SMALL
+}
+
+enum ProductStatus {
+  PENDING
+  IN_PROGRESS
+  FINISHED
+}
+
+input ProductCategoryEntityInput {
+  name: String!
+  profit: Float!
+  products: [ProductEntityInput!]!
+}
+
+input ProductEntityInput {
+  name: String!
+  images: String!
+  size: ProductSize!
+  description: String!
+  available: Boolean!
+  status: ProductStatus!
+  productCategoryId: String!
+  productCategory: ProductCategoryEntityInput
+}
+
 type Query {
   """Returns a list of users"""
   users: [UserModel!]!
 
-  """Returns a user"""
+  """Returns the user that match with the provided id"""
   user(id: ID!): UserModel!
 
-  """Returns the total count of all users"""
+  """Returns the total count of all users by criteria"""
   usersCount: Int!
+
+  """Returns a list of products"""
+  products(query: ProductQueryInput): [ProductEntity!]!
+
+  """
+  Returns the product that match with the given id or NULL if nothing matches
+  """
+  product(id: String!): ProductEntity!
+
+  """Returns the total count of all products by criteria"""
+  productsCount: Int!
+}
+
+input ProductQueryInput {
+  pageSize: Float
+  pageIndex: Float
+  order: [String!]
+  filter: ProductEntityInput
+}
+
+type Mutation {
+  """Create and return a new user"""
+  createUser(createUserDto: CreateUserDto!): UserModel!
+
+  """Create and return a new product"""
+  createProduct(createProductDto: CreateProductDto!): ProductEntity!
+
+  """Overwrite and return the updated product"""
+  overwriteProduct(productId: String!, updateProductDto: UpdateProductDto!): ProductEntity!
+
+  """Update and return the updated product"""
+  updateProduct(productId: String!, patchProductDto: PatchProductDto!): ProductEntity!
+
+  """Remove the product if exist or return null otherwise"""
+  removeProduct(productId: String!): ProductEntity!
+}
+
+"""Data needed to create a new user"""
+input CreateUserDto {
+  email: String!
+  password: String!
+  username: String
+  firstName: String
+  lastName: String
+  requiredActions: [String!]
+  emailVerified: Boolean
+  groups: [String!]
+  enabled: Boolean
+}
+
+"""data required to create a new product"""
+input CreateProductDto {
+  name: String!
+  images: String!
+  description: String!
+  available: Boolean!
+  productCategoryId: String!
+}
+
+input UpdateProductDto {
+  name: String!
+  images: String!
+  description: String!
+  available: Boolean!
+  productCategoryId: String!
+}
+
+input PatchProductDto {
+  name: String!
+  images: String!
+  description: String!
+  available: Boolean!
+  productCategoryId: String!
 }

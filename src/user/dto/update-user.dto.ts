@@ -16,8 +16,8 @@ export class UpdateUserDto implements Omit<CreateUserDto, 'password'> {
   @IsNotEmpty()
   email: string;
 
-  @MaxLength(32, { message: 'user_username_max_length' })
-  @MinLength(4, { message: 'user_username_min_length' })
+  @MaxLength(32, { message: 'user_username_max-length' })
+  @MinLength(4, { message: 'user_username_min-length' })
   @IsString()
   @IsOptional()
   username?: string;
