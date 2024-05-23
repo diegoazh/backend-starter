@@ -3,26 +3,22 @@ import { InjectModel } from '@nestjs/sequelize';
 import { PostEntity, TagEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
 import { NodeConfigService } from '../../shared/services/node-config.service';
+import { buildPartialFindOptions } from '../../shared/utils/fns';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
 
 @Injectable()
 export class TagService {
-  private takeLimit: number;
-
   constructor(
     @InjectModel(TagEntity) private readonly Tag: typeof TagEntity,
     private readonly nodeConfig: NodeConfigService,
-  ) {
-    this.takeLimit = this.nodeConfig.config.get('tag.takeMax');
-  }
+  ) {}
 
   public find(query: IAppQueryString): Promise<TagEntity[]> {
-    const { filter, order, pageIndex = 0, pageSize = this.takeLimit } = query;
+    const { filter, order, pageIndex = 0, pageSize = 0 } = query;
 
     return this.Tag.findAll({
-      limit: pageSize,
-      offset: pageIndex * pageSize,
+      ...buildPartialFindOptions<TagEntity>({ pageSize, pageIndex }),
       where: {
         ...filter,
       },

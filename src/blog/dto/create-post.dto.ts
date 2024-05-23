@@ -24,9 +24,9 @@ export class CreatePostDto {
 
   @IsEnum(PostType)
   @IsOptional()
-  type: (typeof PostType)[keyof typeof PostType];
+  type?: (typeof PostType)[keyof typeof PostType];
 
   @IsBoolean()
   @IsOptional()
-  published: boolean;
+  published?: boolean;
 }

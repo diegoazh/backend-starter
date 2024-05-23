@@ -11,8 +11,6 @@ import { UserModel } from '../models';
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  private readonly takeLimit: number;
-
   private readonly authServerUrl: string;
 
   private readonly realm: string;
@@ -22,7 +20,6 @@ export class UserService {
   private defaultHeaders = { 'Content-Type': 'application/json' };
 
   constructor(private readonly nodeConfigService: NodeConfigService) {
-    this.takeLimit = this.nodeConfigService.config.get<number>('user.takeMax');
     this.authServerUrl = this.nodeConfigService.config.get<string>(
       'keycloak.authServerUrl',
     );

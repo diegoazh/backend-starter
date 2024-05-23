@@ -19,16 +19,4 @@ module.exports = {
     logoutUrl: '',
     redirectUrl: '',
   },
-  users: {
-    takeMax: 200,
-  },
-  profiles: {
-    takeMax: 200,
-  },
-  posts: {
-    takeMax: 200,
-  },
-  category: {
-    takeMax: 200,
-  },
 };

@@ -2,31 +2,24 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProfileEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
-import { NodeConfigService } from '../../shared/services/node-config.service';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { LoggedUserModel } from '../models';
+import { buildPartialFindOptions } from '../../shared/utils/fns';
 
 @Injectable()
 export class ProfileService {
-  private readonly takeLimit: number;
-
   constructor(
     @InjectModel(ProfileEntity)
     private readonly Profile: typeof ProfileEntity,
-    private readonly nodeConfigService: NodeConfigService,
-  ) {
-    this.takeLimit =
-      this.nodeConfigService.config.get<number>('profile.takeMax');
-  }
+  ) {}
 
-  public find(query?: IAppQueryString): Promise<ProfileEntity[]> {
-    const { pageSize = this.takeLimit, pageIndex = 0, filter } = query;
+  public find(query: IAppQueryString = {}): Promise<ProfileEntity[]> {
+    const { pageSize = 0, pageIndex = 0, filter = {} } = query;
 
     return this.Profile.findAll({
-      limit: pageSize,
-      offset: pageIndex * pageSize,
+      ...buildPartialFindOptions<ProfileEntity>({ pageIndex, pageSize }),
       where: {
         ...filter,
       },

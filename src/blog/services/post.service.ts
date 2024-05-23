@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PostEntity, ProfileEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
-import { NodeConfigService } from '../../shared/services/node-config.service';
+import { buildPartialFindOptions } from '../../shared/utils/fns';
 import { LoggedUserModel } from '../../user/models';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
@@ -10,22 +10,16 @@ import { UpdatePostDto } from '../dto/update-post.dto';
 
 @Injectable()
 export class PostService {
-  private readonly takeLimit: number;
-
   constructor(
     @InjectModel(PostEntity)
     private readonly Post: typeof PostEntity,
-    private readonly nodeConfigService: NodeConfigService,
-  ) {
-    this.takeLimit = +this.nodeConfigService.config.get<number>('post.takeMax');
-  }
+  ) {}
 
   public find(query?: IAppQueryString): Promise<PostEntity[]> {
-    const { pageSize = this.takeLimit, pageIndex = 0, filter } = query;
+    const { pageSize = 0, pageIndex = 0, filter } = query;
 
     return this.Post.findAll({
-      limit: pageSize,
-      offset: pageIndex * pageSize,
+      ...buildPartialFindOptions<PostEntity>({ pageIndex, pageSize }),
       where: {
         ...filter,
       },

@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { Attributes, FindOptions, Model } from 'sequelize';
 import { Dispatcher } from 'undici';
 import errors from '../../../errors/errors_messages.json';
 import { KeycloakResponseMessages } from '../constants/app.contant';
@@ -36,12 +37,32 @@ export function parseErrorsToHttpErrors(error: any): HttpException {
     case KeycloakResponseMessages.USER_NOT_FOUND:
       return new NotFoundException(error?.message, {
         cause: error,
-        description: errors.user_not_found,
+        description: errors['user_exception_not-found'],
       });
     default:
       return new InternalServerErrorException(error?.message, {
         cause: error,
-        description: errors.internal_server_error,
+        description: errors['exception_internal-server-error'],
       });
   }
+}
+
+export function buildPartialFindOptions<T extends Model>({
+  pageIndex,
+  pageSize,
+}: {
+  pageSize: number;
+  pageIndex: number;
+}): FindOptions<Attributes<T>> {
+  const options: FindOptions<Attributes<T>> = {};
+
+  if (pageSize) {
+    options.limit = pageSize;
+  }
+
+  if (pageIndex != null) {
+    options.offset = pageIndex * pageSize;
+  }
+
+  return options;
 }

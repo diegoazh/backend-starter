@@ -22,19 +22,4 @@ module.exports = {
     logoutUrl: '',
     redirectUrl: '',
   },
-  user: {
-    takeMax: 200,
-  },
-  profile: {
-    takeMax: 200,
-  },
-  post: {
-    takeMax: 200,
-  },
-  category: {
-    takeMax: 200,
-  },
-  tag: {
-    takeMax: 200,
-  },
 };

@@ -1,5 +1,8 @@
 export const AppResources = {
   USER: 'user',
+  AUTH: 'auth',
+  PRODUCT: 'product',
+  PRODUCT_CATEGORY: 'product_category',
 } as const;
 
 export const AppScopes = {

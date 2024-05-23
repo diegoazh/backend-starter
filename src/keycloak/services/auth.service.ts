@@ -79,7 +79,7 @@ export class AuthService {
       method: 'POST',
     });
 
-    return body.json();
+    return body.json() as Promise<IAccessToken>;
   }
 
   public async refreshToken(refresh_token: string): Promise<IAccessToken> {
@@ -101,7 +101,7 @@ export class AuthService {
       method: 'POST',
     });
 
-    return body.json();
+    return body.json() as Promise<IAccessToken>;
   }
 
   public async logout(refresh_token: string): Promise<void> {

@@ -22,16 +22,4 @@ module.exports = {
     logoutUrl: 'KEYCLOAK_LOGOUT_URL',
     redirectUrl: 'KEYCLOAK_REDIRECT_URL',
   },
-  user: {
-    takeMax: 'APP_USERS_TAKE_MAX',
-  },
-  profile: {
-    takeMax: 'APP_PROFILE_TAKE_MAX',
-  },
-  post: {
-    takeMax: 'APP_POSTS_TAKE_MAX',
-  },
-  category: {
-    takeMax: 'APP_CATEGORY_TAKE_MAX',
-  },
 };
