@@ -38,11 +38,6 @@ export class PatchProductDto
   @IsOptional()
   description?: string;
 
-  // @Field(() => ProductSize)
-  // @IsEnum(ProductSize)
-  // @IsOptional()
-  // size?: (typeof ProductSize)[keyof typeof ProductSize];
-
   @Field()
   @IsBoolean()
   @IsOptional()

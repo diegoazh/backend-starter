@@ -34,11 +34,6 @@ export class CreateProductDto implements Partial<IProductCreationAttributes> {
   @IsOptional()
   description?: string;
 
-  // @Field(() => ProductSize)
-  // @IsEnum(ProductSize)
-  // @IsNotEmpty()
-  // size: (typeof ProductSize)[keyof typeof ProductSize];
-
   @ApiProperty()
   @Field()
   @IsBoolean()

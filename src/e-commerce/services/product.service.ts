@@ -85,7 +85,6 @@ export class ProductService {
     product.description = data.description;
     product.images = data.images;
     product.name = data.name;
-    product.size = data.size;
     product.updatedAt = new Date();
     await product.save();
 
@@ -103,7 +102,6 @@ export class ProductService {
     product.description = data?.description ?? product.description;
     product.images = data?.images ?? product.images;
     product.name = data?.name ?? product.name;
-    product.size = data?.size ?? product.size;
     product.updatedAt = new Date();
     await product.save();
 

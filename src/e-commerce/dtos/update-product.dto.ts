@@ -36,11 +36,6 @@ export class UpdateProductDto
   @IsOptional()
   description?: string;
 
-  // @Field(() => ProductSize)
-  // @IsEnum(ProductSize)
-  // @IsNotEmpty()
-  // size: (typeof ProductSize)[keyof typeof ProductSize];
-
   @Field()
   @IsBoolean()
   @IsNotEmpty()

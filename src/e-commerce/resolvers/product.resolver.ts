@@ -3,10 +3,8 @@ import { Public, Resource, Scopes } from 'nest-keycloak-connect';
 import { ProductEntity } from '../../models';
 import { AppResources, AppScopes } from '../../shared/constants';
 import { ProductQueryInput } from '../../shared/graphql/inputs';
-import { ProductService } from '../services/product.service';
 import { CreateProductDto, PatchProductDto, UpdateProductDto } from '../dtos';
-import { LoggedUser } from '../../shared/decorators';
-import { LoggedUserModel } from '../../user/models';
+import { ProductService } from '../services/product.service';
 
 @Resource(AppResources.PRODUCT)
 @Resolver(() => ProductEntity)
@@ -51,9 +49,8 @@ export class ProductResolver {
   })
   public async createProduct(
     @Args('createProductDto') data: CreateProductDto,
-    @LoggedUser() user: LoggedUserModel,
   ): Promise<ProductEntity> {
-    return this.productService.create(data, user);
+    return this.productService.create(data);
   }
 
   @Public()
@@ -64,9 +61,8 @@ export class ProductResolver {
   public async overwriteProduct(
     @Args('productId') id: string,
     @Args('updateProductDto') data: UpdateProductDto,
-    @LoggedUser() user: LoggedUserModel,
   ): Promise<ProductEntity> {
-    return this.productService.overwrite(id, data, user);
+    return this.productService.overwrite(id, data);
   }
 
   @Public()
@@ -77,9 +73,8 @@ export class ProductResolver {
   public async updateProduct(
     @Args('productId') id: string,
     @Args('patchProductDto') data: PatchProductDto,
-    @LoggedUser() user: LoggedUserModel,
   ): Promise<ProductEntity> {
-    return this.productService.update(id, data, user);
+    return this.productService.update(id, data);
   }
 
   @Public()
@@ -89,8 +84,7 @@ export class ProductResolver {
   })
   public async removeProduct(
     @Args('productId') id: string,
-    @LoggedUser() user: LoggedUserModel,
   ): Promise<{ deleted: number }> {
-    return this.productService.remove(id, user);
+    return this.productService.remove(id);
   }
 }
