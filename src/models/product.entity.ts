@@ -11,6 +11,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Table,
 } from 'sequelize-typescript';
 import {
@@ -20,6 +21,7 @@ import {
 import { WrapperType } from '../shared/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { ProductCategoryEntity } from './product-category.entity';
+import { StockEntity } from './stock.entity';
 
 registerEnumType(ProductSize, { name: 'ProductSize' });
 registerEnumType(ProductStatus, { name: 'ProductStatus' });
@@ -97,4 +99,9 @@ export class ProductEntity extends BaseEntity<
   @Field(() => ProductCategoryEntity, { nullable: true })
   @BelongsTo(() => ProductCategoryEntity)
   productCategory: WrapperType<ProductCategoryEntity>;
+
+  @ApiProperty({ type: () => [StockEntity] })
+  @Field(() => [StockEntity!]!)
+  @HasMany(() => StockEntity)
+  stocks: WrapperType<StockEntity[]>;
 }

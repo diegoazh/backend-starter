@@ -7,3 +7,4 @@ export * from './profile.entity';
 export * from './tag.entity';
 export * from './product.entity';
 export * from './product-category.entity';
+export * from './stock.entity';
