@@ -2,7 +2,8 @@
 const { faker } = require('@faker-js/faker');
 // const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const data = require('../../.data/origami.json');
+const data = require('../../.data/categories-and-products.json');
+const stocks = require('../../.data/stocks.json');
 
 module.exports = {
   up: async (queryInterface) => {
@@ -160,23 +161,88 @@ module.exports = {
       });
 
       const products = data.products.map((value) => {
-        const result = productCategories.find(
+        const product = { ...value };
+        const foundCategory = productCategories.find(
           (category) =>
-            category.name.toLowerCase() === value.categoria.toLowerCase(),
+            category.name.toLowerCase() ===
+            value.productCategoryId.toLowerCase(),
         );
 
-        value.productCategoryId = result.id;
-        value.available = true;
-        value.id = uuidv4();
-        value.createdAt = faker.date.recent({ days: 10, refDate: currentDate });
-        value.updatedAt = faker.date.recent({ days: 10, refDate: currentDate });
-        const { categoria, ...rest } = value;
-        return rest;
+        if (!foundCategory) {
+          throw new Error(
+            `loading products we can't found category [${value.productCategoryId}]`,
+          );
+        }
+
+        product.productCategoryId = foundCategory.id;
+        product.available = true;
+        product.id = uuidv4();
+        product.createdAt = faker.date.recent({
+          days: 10,
+          refDate: currentDate,
+        });
+        product.updatedAt = faker.date.recent({
+          days: 10,
+          refDate: currentDate,
+        });
+
+        return product;
       });
 
       console.info('Products', JSON.stringify(products, null, 2));
 
       await queryInterface.bulkInsert('Products', products, {
+        transaction,
+      });
+
+      const StockTypes = ['ONSITE', 'ONLINE'];
+      const onSiteStock = stocks.onSite.map((stock, index) => {
+        const productStock = {
+          ...stock,
+          type: StockTypes[0],
+          price: +stock.price,
+        };
+
+        const foundCategory = productCategories.find(
+          (category) =>
+            category.name.toLowerCase() ===
+            stock.productCategoryId.toLowerCase(),
+        );
+        const foundProduct = products.find(
+          (product) =>
+            product.name.toLowerCase() === stock.productId.toLowerCase(),
+        );
+
+        if (!foundCategory) {
+          throw new Error(
+            `loading stock we can't found category [${stock.productCategoryId}] - [${stock.productId}] - [${index}]`,
+          );
+        }
+
+        if (!foundProduct) {
+          throw new Error(
+            `loading stock we can't found product [${stock.productId}] - [${stock.productCategoryId}] - [${index}]`,
+          );
+        }
+
+        productStock.productCategoryId = foundCategory.id;
+        productStock.productId = foundProduct.id;
+        productStock.id = uuidv4();
+        productStock.createdAt = faker.date.recent({
+          days: 10,
+          refDate: currentDate,
+        });
+        productStock.updatedAt = faker.date.recent({
+          days: 10,
+          refDate: currentDate,
+        });
+
+        return productStock;
+      });
+
+      console.info('Stocks', JSON.stringify(onSiteStock, null, 2));
+
+      await queryInterface.bulkInsert('Stocks', onSiteStock, {
         transaction,
       });
 

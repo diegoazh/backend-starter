@@ -8,6 +8,7 @@ module.exports = {
       const PostTypes = ['TEXT', 'GALLERY'];
       const ProductSize = ['BIG', 'MEDIUM', 'SMALL'];
       const ProductStatus = ['PENDING', 'IN_PROGRESS', 'FINISHED'];
+      const StockTypes = ['ONSITE', 'ONLINE'];
 
       // await queryInterface.createTable(
       //   'Users',
@@ -413,6 +414,68 @@ module.exports = {
         { transaction },
       );
 
+      await queryInterface.createTable(
+        'Stocks',
+        {
+          id: {
+            type: Sequelize.UUID,
+            defaultValue: Sequelize.UUIDV4,
+            primaryKey: true,
+            allowNull: false,
+          },
+          productCategoryId: {
+            type: Sequelize.UUID,
+            references: {
+              model: 'ProductCategories',
+              key: 'id',
+            },
+            onDelete: 'SET NULL',
+          },
+          productId: {
+            type: Sequelize.UUID,
+            references: {
+              model: 'Products',
+              key: 'id',
+            },
+            onDelete: 'SET NULL',
+          },
+          price: {
+            type: Sequelize.DECIMAL(12, 2),
+            defaultValue: 0,
+            allowNull: false,
+          },
+          quantity: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0,
+            allowNull: false,
+          },
+          type: {
+            type: Sequelize.ENUM,
+            values: StockTypes,
+            default: null,
+            allowNull: true,
+          },
+          priceHistory: {
+            type: Sequelize.JSON,
+            defaultValue: null,
+            allowNull: true,
+          },
+          createdAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          updatedAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          deletedAt: {
+            allowNull: true,
+            type: Sequelize.DATE,
+          },
+        },
+        { transaction },
+      );
+
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
@@ -425,6 +488,7 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
 
     try {
+      await queryInterface.dropTable('Stocks', { transaction });
       await queryInterface.dropTable('Products', { transaction });
       await queryInterface.dropTable('ProductCategories', { transaction });
       await queryInterface.dropTable('Comments', { transaction });
