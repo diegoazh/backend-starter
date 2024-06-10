@@ -61,7 +61,7 @@ export class ProductResolver {
   public async overwriteProduct(
     @Args('productId') id: string,
     @Args('updateProductDto') data: UpdateProductDto,
-  ): Promise<ProductEntity> {
+  ): Promise<ProductEntity | null> {
     return this.productService.overwrite(id, data);
   }
 
@@ -73,7 +73,7 @@ export class ProductResolver {
   public async updateProduct(
     @Args('productId') id: string,
     @Args('patchProductDto') data: PatchProductDto,
-  ): Promise<ProductEntity> {
+  ): Promise<ProductEntity | null> {
     return this.productService.update(id, data);
   }
 
@@ -84,7 +84,7 @@ export class ProductResolver {
   })
   public async removeProduct(
     @Args('productId') id: string,
-  ): Promise<{ deleted: number }> {
+  ): Promise<{ deleted: number } | null> {
     return this.productService.remove(id);
   }
 }

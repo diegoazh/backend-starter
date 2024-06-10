@@ -43,7 +43,10 @@
   "prettier.singleQuote": true,
   "cSpell.words": [
     "Apikey",
+    "Dinero",
+    "Flickr",
     "keycloak",
-    "nestjs"
+    "nestjs",
+    "uuidv"
   ]
 }

@@ -29,4 +29,8 @@ export class CreatePostDto {
   @IsBoolean()
   @IsOptional()
   published?: boolean;
+
+  @IsString()
+  @IsNotEmpty()
+  categoryId: string;
 }

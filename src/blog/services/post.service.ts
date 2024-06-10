@@ -4,6 +4,7 @@ import { PostEntity, ProfileEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
 import { buildPartialFindOptions } from '../../shared/utils/fns';
 import { LoggedUserModel } from '../../user/models';
+import { PostType } from '../constants/blog.constant';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { PatchPostDto } from '../dto/patch-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -15,8 +16,8 @@ export class PostService {
     private readonly Post: typeof PostEntity,
   ) {}
 
-  public find(query?: IAppQueryString): Promise<PostEntity[]> {
-    const { pageSize = 0, pageIndex = 0, filter } = query;
+  public find(query: IAppQueryString): Promise<PostEntity[]> {
+    const { pageSize = 0, pageIndex = 0, filter = {} } = query;
 
     return this.Post.findAll({
       ...buildPartialFindOptions<PostEntity>({ pageIndex, pageSize }),
@@ -38,8 +39,8 @@ export class PostService {
     return this.Post.findByPk(id);
   }
 
-  public async count(query?: IAppQueryString): Promise<{ count: number }> {
-    const { filter } = query;
+  public async count(query: IAppQueryString): Promise<{ count: number }> {
+    const { filter = {} } = query;
 
     const count = await this.Post.count({
       where: {
@@ -51,7 +52,13 @@ export class PostService {
   }
 
   public create(
-    { title, content = 'should be completed', type, published }: CreatePostDto,
+    {
+      title,
+      content = '',
+      type = PostType.TEXT,
+      published = false,
+      categoryId,
+    }: CreatePostDto,
     loggedUser: LoggedUserModel,
   ): Promise<PostEntity> {
     return this.Post.create({
@@ -60,13 +67,14 @@ export class PostService {
       type,
       published,
       authorId: loggedUser.id,
+      categoryId,
     });
   }
 
   public async overwrite(
     id: string,
     data: UpdatePostDto,
-  ): Promise<PostEntity | undefined> {
+  ): Promise<PostEntity | null> {
     const postFounded = await this.findById(id);
 
     if (postFounded) {
@@ -75,14 +83,16 @@ export class PostService {
       postFounded.type = data.type;
       postFounded.published = data.published;
 
-      return postFounded.save();
+      await postFounded.save();
     }
+
+    return postFounded;
   }
 
   public async update(
     id: string,
     data: PatchPostDto,
-  ): Promise<PostEntity | undefined> {
+  ): Promise<PostEntity | null> {
     const postFounded = await this.findById(id);
 
     if (postFounded) {
@@ -102,8 +112,10 @@ export class PostService {
         postFounded.published = data.published;
       }
 
-      return postFounded.save();
+      await postFounded.save();
     }
+
+    return postFounded;
   }
 
   public async remove(id: string): Promise<{ deleted: number }> {

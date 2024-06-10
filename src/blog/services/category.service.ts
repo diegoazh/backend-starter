@@ -13,7 +13,7 @@ export class CategoryService {
     private readonly Category: typeof CategoryEntity,
   ) {}
 
-  public find(query: IAppQueryString): Promise<CategoryEntity[]> {
+  public find(query: IAppQueryString = {}): Promise<CategoryEntity[]> {
     const { filter, order, pageIndex = 0, pageSize = 0 } = query;
 
     return this.Category.findAll({
@@ -30,8 +30,8 @@ export class CategoryService {
     return this.Category.findByPk(id);
   }
 
-  public async count(query?: IAppQueryString): Promise<{ count: number }> {
-    const { filter } = query;
+  public async count(query: IAppQueryString): Promise<{ count: number }> {
+    const { filter = {} } = query;
 
     const count = await this.Category.count({
       where: {
@@ -51,20 +51,22 @@ export class CategoryService {
   public async overwrite(
     id: string,
     data: CreateCategoryDto,
-  ): Promise<CategoryEntity> {
+  ): Promise<CategoryEntity | null> {
     const categoryFound = await this.findById(id);
 
     if (categoryFound) {
       categoryFound.set({ ...data });
 
-      return categoryFound.save();
+      await categoryFound.save();
     }
+
+    return categoryFound;
   }
 
   public async update(
     id: string,
     data: PatchCategoryDto,
-  ): Promise<CategoryEntity> {
+  ): Promise<CategoryEntity | null> {
     const categoryFound = await this.findById(id);
 
     if (categoryFound) {
@@ -72,8 +74,10 @@ export class CategoryService {
         categoryFound.set({ name: data.name });
       }
 
-      return categoryFound.save();
+      await categoryFound.save();
     }
+
+    return categoryFound;
   }
 
   public async remove(id: string): Promise<{ deleted: number }> {

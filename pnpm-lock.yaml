@@ -14,6 +14,9 @@ importers:
       '@babel/register':
         specifier: ^7.22.5
         version: 7.22.5(@babel/core@7.20.5)
+      '@dinero.js/currencies':
+        specifier: 2.0.0-alpha.14
+        version: 2.0.0-alpha.14
       '@faker-js/faker':
         specifier: ^8.0.2
         version: 8.0.2
@@ -62,9 +65,15 @@ importers:
       config:
         specifier: ^3.3.9
         version: 3.3.9
+      dinero.js:
+        specifier: 2.0.0-alpha.14
+        version: 2.0.0-alpha.14
       graphql:
         specifier: ^16.8.1
         version: 16.8.1
+      graphql-type-json:
+        specifier: ^0.3.2
+        version: 0.3.2(graphql@16.8.1)
       helmet:
         specifier: ^7.0.0
         version: 7.0.0
@@ -642,6 +651,15 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@dinero.js/calculator-number@2.0.0-alpha.14':
+    resolution: {integrity: sha512-Vmlu6eXNtkFU2cqlrpqfq8KQP9onALf8Es2d34liVa3k3RHjuhizgFUU3V3/tsjOu5WekZq+gYPOr58XVTkB7A==}
+
+  '@dinero.js/core@2.0.0-alpha.14':
+    resolution: {integrity: sha512-CtKELJ783joUbaU62fRM2xDXb4XYSy0MgOuIkPWgVOS3SYKKb6+2Ec9bNlvrW8lsPROz/RsvCuYVTphrZ79twg==}
+
+  '@dinero.js/currencies@2.0.0-alpha.14':
+    resolution: {integrity: sha512-Ck5ZLjRI7Pl7Y4VkeOst4WEwiN5vZezv8GHcXWsVLUfTNsmkV37VeLYDRAuTUP4akEJyIry+1o1qHYNtLq3eNw==}
 
   '@eslint-community/eslint-utils@4.4.0':
     resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}
@@ -1925,8 +1943,8 @@ packages:
     resolution: {integrity: sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==}
     engines: {node: '>=6.0'}
 
-  chromedriver@124.0.1:
-    resolution: {integrity: sha512-hxd1tpAUhgMFBZd1h3W7KyMckxofOYCuKAMtcvBDAU0YKKorZcWuq6zP06+Ph0Z1ynPjtgAj0hP9VphCwesjZw==}
+  chromedriver@125.0.3:
+    resolution: {integrity: sha512-Qzuk5Wian2o3EVGjtbz6V/jv+pT/AV9246HbG6kUljZXXjsKZLZxqJC+kHR3qEh/wdv4EJD0YwAOWV72v9hogw==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -2293,6 +2311,9 @@ packages:
   diff@4.0.2:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
     engines: {node: '>=0.3.1'}
+
+  dinero.js@2.0.0-alpha.14:
+    resolution: {integrity: sha512-dkURHd9P+2TjuSTMUAnvrB7SsL4GbBYG/WPtIBV8M+L7Xf80x84sJcUUTxIS33S4AlkIbVANlaL86w2g5zdrmg==}
 
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
@@ -2990,6 +3011,11 @@ packages:
     engines: {node: '>=10'}
     peerDependencies:
       graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+
+  graphql-type-json@0.3.2:
+    resolution: {integrity: sha512-J+vjof74oMlCWXSvt0DOf2APEdZOCdubEvGDUAlqH//VBYcOYsGgRW7Xzorr44LvkjiuvecWc8fChxuZZbChtg==}
+    peerDependencies:
+      graphql: '>=0.8.0'
 
   graphql-ws@5.14.0:
     resolution: {integrity: sha512-itrUTQZP/TgswR4GSSYuwWUzrE/w5GhbwM2GX3ic2U7aw33jgEsayfIlvaj7/GcIvZgNMzsPTrE5hqPuFUiE5g==}
@@ -6079,6 +6105,16 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
+  '@dinero.js/calculator-number@2.0.0-alpha.14':
+    dependencies:
+      '@dinero.js/core': 2.0.0-alpha.14
+
+  '@dinero.js/core@2.0.0-alpha.14':
+    dependencies:
+      '@dinero.js/currencies': 2.0.0-alpha.14
+
+  '@dinero.js/currencies@2.0.0-alpha.14': {}
+
   '@eslint-community/eslint-utils@4.4.0(eslint@8.43.0)':
     dependencies:
       eslint: 8.43.0
@@ -7643,7 +7679,7 @@ snapshots:
 
   chrome-trace-event@1.0.3: {}
 
-  chromedriver@124.0.1:
+  chromedriver@125.0.3:
     dependencies:
       '@testim/chrome-version': 1.1.4
       axios: 1.6.7
@@ -8009,6 +8045,12 @@ snapshots:
   diff-sequences@29.4.3: {}
 
   diff@4.0.2: {}
+
+  dinero.js@2.0.0-alpha.14:
+    dependencies:
+      '@dinero.js/calculator-number': 2.0.0-alpha.14
+      '@dinero.js/core': 2.0.0-alpha.14
+      '@dinero.js/currencies': 2.0.0-alpha.14
 
   dir-glob@3.0.1:
     dependencies:
@@ -8954,6 +8996,10 @@ snapshots:
       graphql: 16.8.1
       tslib: 2.6.0
 
+  graphql-type-json@0.3.2(graphql@16.8.1):
+    dependencies:
+      graphql: 16.8.1
+
   graphql-ws@5.14.0(graphql@16.8.1):
     dependencies:
       graphql: 16.8.1
@@ -9811,7 +9857,7 @@ snapshots:
     dependencies:
       jwk-to-pem: 2.0.5
     optionalDependencies:
-      chromedriver: 124.0.1
+      chromedriver: 125.0.3
     transitivePeerDependencies:
       - debug
       - supports-color

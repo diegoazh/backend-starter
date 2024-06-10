@@ -71,14 +71,13 @@ export class ProductCategoryService {
   public async overwrite(
     id: string,
     data: CreateProductCategoryDto,
-  ): Promise<ProductCategoryEntity> {
+  ): Promise<ProductCategoryEntity | null> {
     const productCategory = await this.findById(id);
 
     if (productCategory) {
       Object.keys(productCategory.toJSON()).forEach((key) => {
         productCategory[key] = data[key];
       });
-      productCategory.updatedAt = new Date();
 
       await productCategory.save();
     }
@@ -89,7 +88,7 @@ export class ProductCategoryService {
   public async update(
     id: string,
     data: Partial<CreateProductCategoryDto>,
-  ): Promise<ProductCategoryEntity> {
+  ): Promise<ProductCategoryEntity | null> {
     const productCategory = await this.findById(id);
 
     if (productCategory) {
@@ -97,7 +96,6 @@ export class ProductCategoryService {
         productCategory[key] =
           data[key] != null ? data[key] : productCategory[key];
       });
-      productCategory.updatedAt = new Date();
 
       await productCategory.save();
     }

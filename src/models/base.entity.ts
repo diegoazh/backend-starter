@@ -17,7 +17,10 @@ export interface IBaseAttributes {
 }
 
 @InterfaceType()
-export abstract class BaseEntity<T, U> extends Model<T, U> {
+export abstract class BaseEntity<T extends {}, U extends {}> extends Model<
+  T,
+  U
+> {
   @ApiProperty()
   @Field(() => ID!)
   @Column({

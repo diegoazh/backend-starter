@@ -24,16 +24,17 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import errors from '../../../errors/errors_messages.json';
 import { ProfileEntity } from '../../models';
 import { LoggedUser } from '../../shared/decorators';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
+import { parseErrorsToHttpErrors } from '../../shared/utils';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { LoggedUserModel } from '../models';
 import { ProfileService } from '../services/profile.service';
-import { parseErrorsToHttpErrors } from '../../shared/utils';
 
 @ApiTags('Profiles controller')
 @Controller('profiles')
@@ -66,11 +67,16 @@ export class ProfileController {
   public async find(
     @Query() query?: IAppQueryString,
   ): Promise<AppResponse<ProfileEntity[]>> {
-    const profiles = await this.profileService.find(query);
+    try {
+      const profiles = await this.profileService.find(query);
 
-    return {
-      data: profiles.map((profile) => profile.toJSON()),
-    };
+      return {
+        data: profiles.map((profile) => profile.toJSON()),
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 
   @ApiOkResponse({
@@ -90,9 +96,14 @@ export class ProfileController {
     @Query()
     query?: IAppQueryString,
   ): Promise<AppResponse<number>> {
-    const { count } = await this.profileService.count(query);
+    try {
+      const { count } = await this.profileService.count(query);
 
-    return { data: count };
+      return { data: count };
+    } catch (error) {
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 
   @ApiFoundResponse({
@@ -117,7 +128,10 @@ export class ProfileController {
       const profile = await this.profileService.findById(id);
 
       if (!profile) {
-        throw new NotFoundException('profile_exception_not-found');
+        throw new NotFoundException(errors['profile_exception_not-found'], {
+          cause: new Error(errors['profile_exception_not-found']),
+          description: errors['profile_exception_not-found'],
+        });
       }
 
       return { data: profile.toJSON() };
@@ -175,9 +189,21 @@ export class ProfileController {
     @Param('id') id: string,
     @Body() profile: UpdateProfileDto,
   ): Promise<AppResponse<ProfileEntity>> {
-    const updatedProfile = await this.profileService.overwrite(id, profile);
+    try {
+      const updatedProfile = await this.profileService.overwrite(id, profile);
 
-    return { data: updatedProfile.toJSON() };
+      if (!updatedProfile) {
+        throw new NotFoundException(errors['profile_exception_not-found'], {
+          cause: new Error(errors['profile_exception_not-found']),
+          description: errors['profile_exception_not-found'],
+        });
+      }
+
+      return { data: updatedProfile.toJSON() };
+    } catch (error) {
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 
   @ApiOkResponse({
@@ -197,9 +223,21 @@ export class ProfileController {
     @Param('id') id: string,
     profile: PatchProfileDto,
   ): Promise<AppResponse<ProfileEntity>> {
-    const updatedProfile = await this.profileService.update(id, profile);
+    try {
+      const updatedProfile = await this.profileService.update(id, profile);
 
-    return { data: updatedProfile.toJSON() };
+      if (!updatedProfile) {
+        throw new NotFoundException(errors['profile_exception_not-found'], {
+          cause: new Error(errors['profile_exception_not-found']),
+          description: errors['profile_exception_not-found'],
+        });
+      }
+
+      return { data: updatedProfile.toJSON() };
+    } catch (error) {
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 
   @ApiOkResponse({
@@ -216,8 +254,20 @@ export class ProfileController {
   @ApiInternalServerErrorResponse({ description: 'Unexpected error occurs' })
   @Delete(':id')
   public async remove(@Param('id') id: string): Promise<AppResponse<number>> {
-    const { deleted } = await this.profileService.remove(id);
+    try {
+      const result = await this.profileService.remove(id);
 
-    return { data: deleted };
+      if (!result) {
+        throw new NotFoundException(errors['profile_exception_not-found'], {
+          cause: new Error(errors['profile_exception_not-found']),
+          description: errors['profile_exception_not-found'],
+        });
+      }
+
+      return { data: result.deleted };
+    } catch (error) {
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 }

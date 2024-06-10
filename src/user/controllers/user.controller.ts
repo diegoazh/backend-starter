@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -68,7 +69,7 @@ export class UserController {
   @Get()
   async find(@Req() req: Request): Promise<AppPaginatedResponse<UserModel[]>> {
     try {
-      const { authorization } = req.headers;
+      const { authorization = '' } = req.headers;
       const users = await this.userService.find(authorization);
 
       return { data: users };
@@ -96,7 +97,7 @@ export class UserController {
   @Get('count')
   async count(@Req() req: Request): Promise<AppPaginatedResponse<number>> {
     try {
-      const { authorization } = req.headers;
+      const { authorization = '' } = req.headers;
       const { count } = await this.userService.count(authorization);
 
       return { data: count };
@@ -124,9 +125,9 @@ export class UserController {
   async findById(
     @Req() req: Request,
     @Param('id') id: string,
-  ): Promise<AppResponse<UserModel>> {
+  ): Promise<AppResponse<UserModel | null>> {
     try {
-      const { authorization } = req.headers;
+      const { authorization = '' } = req.headers;
       const user = await this.userService.findById(id, authorization);
 
       if (!user) {
@@ -163,8 +164,19 @@ export class UserController {
     @Body() data: CreateUserDto,
   ): Promise<AppPaginatedResponse<UserModel>> {
     try {
-      const { authorization } = req.headers;
+      const { authorization = '' } = req.headers;
       const user = await this.userService.create(data, authorization);
+
+      if (!user) {
+        throw new BadRequestException(
+          errors['user_exception_can-not-be-created'],
+          {
+            cause: new Error(errors['user_exception_can-not-be-created']),
+            description: errors['user_exception_can-not-be-created'],
+          },
+        );
+      }
+
       return { data: user };
     } catch (error) {
       this.logger.error(error);
@@ -193,12 +205,19 @@ export class UserController {
     @Body() user: UpdateUserDto,
   ): Promise<AppResponse<UserModel>> {
     try {
-      const { authorization } = req.headers;
+      const { authorization = '' } = req.headers;
       const updatedUser = await this.userService.overwrite(
         id,
         user,
         authorization,
       );
+
+      if (!updatedUser) {
+        throw new NotFoundException(errors['user_exception_not-found'], {
+          cause: new Error(errors['user_exception_not-found']),
+          description: errors['user_exception_not-found'],
+        });
+      }
 
       return { data: updatedUser };
     } catch (error) {
@@ -226,14 +245,21 @@ export class UserController {
     @Req() req: Request,
     @Param('id') id: string,
     user: PatchUserDto,
-  ): Promise<AppResponse<UserModel>> {
+  ): Promise<AppResponse<UserModel | null>> {
     try {
-      const { authorization } = req.headers;
+      const { authorization = '' } = req.headers;
       const updatedUser = await this.userService.update(
         id,
         user,
         authorization,
       );
+
+      if (!updatedUser) {
+        throw new NotFoundException(errors['user_exception_not-found'], {
+          cause: new Error(errors['user_exception_not-found']),
+          description: errors['user_exception_not-found'],
+        });
+      }
 
       return { data: updatedUser };
     } catch (error) {
@@ -254,7 +280,7 @@ export class UserController {
   @Delete(':id')
   async remove(@Req() req: Request, @Param('id') id: string): Promise<void> {
     try {
-      const { authorization } = req.headers;
+      const { authorization = '' } = req.headers;
       await this.userService.remove(id, authorization);
     } catch (error) {
       this.logger.error(error);

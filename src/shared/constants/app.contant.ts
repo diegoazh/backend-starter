@@ -3,6 +3,7 @@ export const AppResources = {
   AUTH: 'auth',
   PRODUCT: 'product',
   PRODUCT_CATEGORY: 'product_category',
+  STOCKS: 'stocks',
 } as const;
 
 export const AppScopes = {

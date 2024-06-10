@@ -17,12 +17,17 @@ export class CryptoService {
 
   private readonly keyLen = 24;
 
-  private readonly password: string;
+  private readonly password?: string;
 
   private readonly key: Buffer;
 
   constructor(private readonly configService: ConfigService) {
     this.password = this.configService.get<string>('HASH_PASSWORD');
+
+    if (!this.password) {
+      throw new Error('HASH_PASSWORD is not defined');
+    }
+
     this.key = scryptSync(this.password, this.salt, this.keyLen);
   }
 

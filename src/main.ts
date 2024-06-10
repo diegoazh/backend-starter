@@ -9,7 +9,7 @@ import {
 import helmet from 'helmet';
 import { version } from '../package.json';
 import { AppModule } from './app.module';
-import { TagEntity } from './models';
+import { StockEntity, TagEntity } from './models';
 import {
   AppPaginatedResponse,
   AppResponse,
@@ -80,13 +80,16 @@ async function bootstrap(): Promise<void> {
         PaginationLinks,
         AppPaginatedResponse,
         AppResponse,
+        StockEntity,
       ],
     };
     const document = SwaggerModule.createDocument(app, config, options);
     SwaggerModule.setup('api', app, document);
   }
 
-  await app.listen(parseInt(configService.get<string>('APP_PORT'), 10));
+  await app.listen(
+    parseInt(configService.get<string>('APP_PORT') || '3000', 10),
+  );
 
   const uri = `http://localhost:${configService.get<string>('APP_PORT')}`;
 

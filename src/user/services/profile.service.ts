@@ -1,12 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProfileEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
+import { buildPartialFindOptions } from '../../shared/utils/fns';
 import { CreateProfileDto } from '../dto/create-profile.dto';
 import { PatchProfileDto } from '../dto/patch-profile.dto';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { LoggedUserModel } from '../models';
-import { buildPartialFindOptions } from '../../shared/utils/fns';
 
 @Injectable()
 export class ProfileService {
@@ -33,7 +33,7 @@ export class ProfileService {
     return this.Profile.findByPk(id);
   }
 
-  public async count(query?: IAppQueryString): Promise<{ count: number }> {
+  public async count(query: IAppQueryString = {}): Promise<{ count: number }> {
     const { filter } = query;
 
     const count = await this.Profile.count({
@@ -60,47 +60,43 @@ export class ProfileService {
   public async overwrite(
     id: string,
     data: UpdateProfileDto,
-  ): Promise<ProfileEntity | undefined> {
+  ): Promise<ProfileEntity | null> {
     const savedProfile = await this.findById(id);
 
     if (savedProfile) {
-      savedProfile.bio = data.bio;
-      savedProfile.firstName = data.firstName;
-      savedProfile.lastName = data.lastName;
+      Object.keys(data).forEach((key) => {
+        savedProfile[key] = data[key];
+      });
 
-      return savedProfile.save();
+      await savedProfile.save();
     }
+
+    return savedProfile;
   }
 
   public async update(
     id: string,
     data: PatchProfileDto,
-  ): Promise<ProfileEntity | undefined> {
+  ): Promise<ProfileEntity | null> {
     const savedProfile = await this.findById(id);
 
     if (savedProfile) {
-      if (data.bio) {
-        savedProfile.bio = data.bio;
-      }
+      Object.keys(data).forEach((key) => {
+        if (data[key] != null) {
+          savedProfile[key] = data[key];
+        }
+      });
 
-      if (data.firstName) {
-        savedProfile.firstName = data.firstName;
-      }
-
-      if (data.lastName) {
-        savedProfile.lastName = data.lastName;
-      }
-
-      return savedProfile.save();
+      await savedProfile.save();
     }
+
+    return savedProfile;
   }
 
-  public async remove(id: string): Promise<{ deleted: number }> {
+  public async remove(id: string): Promise<{ deleted: number } | null> {
     const savedProfile = await this.findById(id);
 
-    if (!savedProfile) {
-      throw new NotFoundException('profile_exception_not_found');
-    }
+    if (!savedProfile) return savedProfile;
 
     const deleted = await this.Profile.destroy({ where: { id } });
 

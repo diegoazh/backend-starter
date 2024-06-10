@@ -72,7 +72,7 @@ export class PostController {
   async find(
     @Query() query?: IAppQueryString,
   ): Promise<AppPaginatedResponse<PostEntity[]>> {
-    const posts = await this.postService.find(query);
+    const posts = await this.postService.find({ ...query });
 
     return {
       data: posts.map((post) => post.toJSON()),
@@ -95,7 +95,7 @@ export class PostController {
     @Query()
     query?: IAppQueryString,
   ): Promise<AppResponse<number>> {
-    const { count } = await this.postService.count(query);
+    const { count } = await this.postService.count({ ...query });
 
     return { data: count };
   }
@@ -167,10 +167,10 @@ export class PostController {
   async overwrite(
     @Param('id') id: string,
     @Body() postData: UpdatePostDto,
-  ): Promise<AppResponse<PostEntity>> {
+  ): Promise<AppResponse<PostEntity | undefined>> {
     const updatedPost = await this.postService.overwrite(id, postData);
 
-    return { data: updatedPost.toJSON() };
+    return { data: updatedPost?.toJSON() };
   }
 
   @ApiOkResponse({
@@ -190,10 +190,10 @@ export class PostController {
   async update(
     @Param('id') id: string,
     postData: PatchPostDto,
-  ): Promise<AppResponse<PostEntity>> {
+  ): Promise<AppResponse<PostEntity | undefined>> {
     const updatedPost = await this.postService.update(id, postData);
 
-    return { data: updatedPost.toJSON() };
+    return { data: updatedPost?.toJSON() };
   }
 
   @ApiOkResponse({

@@ -27,24 +27,24 @@ import {
 } from '@nestjs/swagger';
 import { Public, Resource, Scopes } from 'nest-keycloak-connect';
 import errors from '../../../errors/errors_messages.json';
-import { ProductEntity } from '../../models';
+import { StockEntity } from '../../models';
 import { AppResources, AppScopes } from '../../shared/constants';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { parseErrorsToHttpErrors } from '../../shared/utils';
-import { CreateProductDto, PatchProductDto, UpdateProductDto } from '../dtos';
-import { ProductService } from '../services/product.service';
+import { CreateStockDto } from '../dtos';
+import { StockService } from '../services/stock.service';
 
-@ApiTags('Products controller')
-@Resource(AppResources.PRODUCT)
-@Controller('products')
-export class ProductController {
-  private readonly logger = new Logger(ProductController.name);
+@ApiTags('Stocks controller')
+@Resource(AppResources.STOCKS)
+@Controller('stocks')
+export class StockController {
+  private readonly logger = new Logger(StockController.name);
 
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly stockService: StockService) {}
 
   @ApiOkResponse({
-    description: 'A list of products',
+    description: 'A list of stock',
     schema: {
       allOf: [
         { $ref: getSchemaPath(AppPaginatedResponse) },
@@ -52,7 +52,7 @@ export class ProductController {
           properties: {
             data: {
               type: 'array',
-              items: { $ref: getSchemaPath(ProductEntity) },
+              items: { $ref: getSchemaPath(StockEntity) },
             },
           },
         },
@@ -65,21 +65,21 @@ export class ProductController {
   @Get()
   public async find(
     @Query() query?: IAppQueryString,
-  ): Promise<AppResponse<ProductEntity[]>> {
+  ): Promise<AppResponse<StockEntity[]>> {
     try {
-      const products = await this.productService.find(query);
+      const stocks = await this.stockService.find(query);
 
       return {
-        data: products.map((product) => product.toJSON()),
+        data: stocks.map((stock) => stock.toJSON()),
       };
     } catch (error) {
-      this.logger.error(`PRODUCT_FIND: ${error}`);
+      this.logger.error(`STOCK_FIND: ${error}`);
       throw parseErrorsToHttpErrors(error);
     }
   }
 
   @ApiOkResponse({
-    description: 'Returns the total count of all products by criteria',
+    description: 'Returns the total count of all stocks by criteria',
     schema: {
       properties: {
         data: { type: 'integer' },
@@ -94,20 +94,20 @@ export class ProductController {
     @Query() query?: IAppQueryString,
   ): Promise<AppResponse<number>> {
     try {
-      const { count } = await this.productService.count(query);
+      const { count } = await this.stockService.count(query);
 
       return { data: count };
     } catch (error) {
-      this.logger.error(`PRODUCT_COUNT: ${error}`);
+      this.logger.error(`STOCK_COUNT: ${error}`);
       throw parseErrorsToHttpErrors(error);
     }
   }
 
   @ApiFoundResponse({
-    description: 'A product object that match with the provided id',
+    description: 'A stock object that match with the provided id',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(ProductEntity) },
+        data: { $ref: getSchemaPath(StockEntity) },
       },
     },
   })
@@ -120,34 +120,34 @@ export class ProductController {
   @Get(':id')
   public async findById(
     @Param() id: string,
-  ): Promise<AppResponse<ProductEntity>> {
+  ): Promise<AppResponse<StockEntity>> {
     try {
-      const product = await this.productService.findById(id);
+      const stock = await this.stockService.findById(id);
 
-      if (!product) {
-        throw new NotFoundException(errors['product_exception_not-found'], {
-          cause: new Error(errors['product_exception_not-found']),
-          description: errors['product_exception_not-found'],
+      if (!stock) {
+        throw new NotFoundException(errors['stock_exception_not-found'], {
+          cause: new Error(errors['stock_exception_not-found']),
+          description: errors['stock_exception_not-found'],
         });
       }
 
-      return { data: product.toJSON() };
+      return { data: stock.toJSON() };
     } catch (error) {
-      this.logger.error(`PRODUCT_BY_ID: ${error}`);
+      this.logger.error(`STOCK_BY_ID: ${error}`);
       throw parseErrorsToHttpErrors(error);
     }
   }
 
   @ApiCreatedResponse({
-    description: 'A product was created successfully',
+    description: 'A stock was created successfully',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(ProductEntity) },
+        data: { $ref: getSchemaPath(StockEntity) },
       },
     },
   })
   @ApiConflictResponse({
-    description: 'when product already exists with the same main constraints',
+    description: 'when stock already exists with the same main constraints',
   })
   @ApiUnauthorizedResponse({
     description: 'When hit the endpoint without a valid login',
@@ -156,23 +156,23 @@ export class ProductController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   public async create(
-    @Body() data: CreateProductDto,
-  ): Promise<AppResponse<ProductEntity>> {
+    @Body() data: CreateStockDto,
+  ): Promise<AppResponse<StockEntity>> {
     try {
-      const product = await this.productService.create(data);
+      const product = await this.stockService.create(data);
 
       return { data: product.toJSON() };
     } catch (error) {
-      this.logger.error(`PRODUCT_CREATE: ${error}`);
+      this.logger.error(`STOCK_CREATE: ${error}`);
       throw parseErrorsToHttpErrors(error);
     }
   }
 
   @ApiAcceptedResponse({
-    description: 'The product was overwrite successfully',
+    description: 'The stock was overwrite successfully',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(ProductEntity) },
+        data: { $ref: getSchemaPath(StockEntity) },
       },
     },
   })
@@ -185,30 +185,30 @@ export class ProductController {
   @Put(':id')
   public async overwrite(
     @Param('id') id: string,
-    @Body() data: UpdateProductDto,
-  ): Promise<AppResponse<ProductEntity>> {
+    @Body() data: CreateStockDto,
+  ): Promise<AppResponse<StockEntity>> {
     try {
-      const updatedProduct = await this.productService.overwrite(id, data);
+      const updatedProduct = await this.stockService.overwrite(id, data);
 
       if (!updatedProduct) {
-        throw new NotFoundException(errors['product_exception_not-found'], {
-          cause: new Error(errors['product_exception_not-found']),
-          description: errors['product_exception_not-found'],
+        throw new NotFoundException(errors['stock_exception_not-found'], {
+          cause: new Error(errors['stock_exception_not-found']),
+          description: errors['stock_exception_not-found'],
         });
       }
 
       return { data: updatedProduct };
     } catch (error) {
-      this.logger.error(`PRODUCT_OVERWRITE: ${error}`);
+      this.logger.error(`STOCK_OVERWRITE: ${error}`);
       throw parseErrorsToHttpErrors(error);
     }
   }
 
   @ApiAcceptedResponse({
-    description: 'The product was updated successfully',
+    description: 'The stock was updated successfully',
     schema: {
       properties: {
-        data: { $ref: getSchemaPath(ProductEntity) },
+        data: { $ref: getSchemaPath(StockEntity) },
       },
     },
   })
@@ -221,21 +221,21 @@ export class ProductController {
   @Patch(':id')
   public async update(
     @Param('id') id: string,
-    @Body() data: PatchProductDto,
-  ): Promise<AppResponse<ProductEntity>> {
+    @Body() data: Partial<CreateStockDto>,
+  ): Promise<AppResponse<StockEntity>> {
     try {
-      const updatedProduct = await this.productService.update(id, data);
+      const updatedProduct = await this.stockService.update(id, data);
 
       if (!updatedProduct) {
-        throw new NotFoundException(errors['product_exception_not-found'], {
-          cause: new Error(errors['product_exception_not-found']),
-          description: errors['product_exception_not-found'],
+        throw new NotFoundException(errors['stock_exception_not-found'], {
+          cause: new Error(errors['stock_exception_not-found']),
+          description: errors['stock_exception_not-found'],
         });
       }
 
       return { data: updatedProduct };
     } catch (error) {
-      this.logger.error(`PRODUCT_UPDATE: ${error}`);
+      this.logger.error(`STOCK_UPDATE: ${error}`);
       throw parseErrorsToHttpErrors(error);
     }
   }
@@ -255,18 +255,18 @@ export class ProductController {
   @Delete(':id')
   public async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     try {
-      const result = await this.productService.remove(id);
+      const result = await this.stockService.remove(id);
 
       if (!result) {
-        throw new NotFoundException(errors['product_exception_not-found'], {
-          cause: new Error(errors['product_exception_not-found']),
-          description: errors['product_exception_not-found'],
+        throw new NotFoundException(errors['stock_exception_not-found'], {
+          cause: new Error(errors['stock_exception_not-found']),
+          description: errors['stock_exception_not-found'],
         });
       }
 
       return { data: result.deleted };
     } catch (error) {
-      this.logger.error(`PRODUCT_REMOVE: ${error}`);
+      this.logger.error(`STOCK_REMOVE: ${error}`);
       throw parseErrorsToHttpErrors(error);
     }
   }

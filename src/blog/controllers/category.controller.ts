@@ -23,14 +23,14 @@ import {
   ApiUnauthorizedResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { Public, Resource, Scopes } from 'nest-keycloak-connect';
 import { CategoryEntity } from '../../models';
+import { AppScopes } from '../../shared/constants';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
 import { CategoryService } from '../services/category.service';
-import { Public, Resource, Scopes } from 'nest-keycloak-connect';
-import { AppScopes } from '../../shared/constants';
 
 @ApiTags('Categories controller')
 @Resource('category')
@@ -84,7 +84,7 @@ export class CategoryController {
     @Query()
     query?: IAppQueryString,
   ): Promise<AppResponse<number>> {
-    const { count } = await this.categoryService.count(query);
+    const { count } = await this.categoryService.count({ ...query });
 
     return { data: count };
   }
@@ -163,6 +163,10 @@ export class CategoryController {
       categoryData,
     );
 
+    if (!updatedCategory) {
+      throw new NotFoundException();
+    }
+
     return { data: updatedCategory.toJSON() };
   }
 
@@ -184,9 +188,13 @@ export class CategoryController {
     @Param('id') id: string,
     categoryData: PatchCategoryDto,
   ): Promise<AppResponse<CategoryEntity>> {
-    const updateCategory = await this.categoryService.update(id, categoryData);
+    const updatedCategory = await this.categoryService.update(id, categoryData);
 
-    return { data: updateCategory.toJSON() };
+    if (!updatedCategory) {
+      throw new NotFoundException();
+    }
+
+    return { data: updatedCategory.toJSON() };
   }
 
   @ApiOkResponse({

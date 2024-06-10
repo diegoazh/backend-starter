@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   NotFoundException,
   Param,
   Patch,
@@ -29,6 +30,7 @@ import { TagEntity } from '../../models';
 import { AppScopes } from '../../shared/constants';
 import { IAppQueryString } from '../../shared/interfaces';
 import { AppPaginatedResponse, AppResponse } from '../../shared/responses';
+import { parseErrorsToHttpErrors } from '../../shared/utils';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchTagDto } from '../dto/patch-tag.dto';
 import { UpdateTagDto } from '../dto/update-tag.dto';
@@ -38,6 +40,8 @@ import { TagService } from '../services/tag.service';
 @Resource('tag')
 @Controller('tags')
 export class TagController {
+  private readonly logger = new Logger(TagController.name);
+
   constructor(private readonly tagService: TagService) {}
 
   @ApiOkResponse({
@@ -63,7 +67,7 @@ export class TagController {
   public async find(
     @Query() query?: IAppQueryString,
   ): Promise<AppPaginatedResponse<TagEntity[]>> {
-    const tags = await this.tagService.find(query);
+    const tags = await this.tagService.find({ ...query });
 
     return {
       data: tags.map((tag) => tag.toJSON()),
@@ -86,7 +90,7 @@ export class TagController {
     @Query()
     query?: IAppQueryString,
   ): Promise<AppResponse<number>> {
-    const { count } = await this.tagService.count(query);
+    const { count } = await this.tagService.count({ ...query });
 
     return { data: count };
   }
@@ -164,6 +168,10 @@ export class TagController {
   ): Promise<AppResponse<TagEntity>> {
     const updatedTag = await this.tagService.overwrite(id, tagData);
 
+    if (!updatedTag) {
+      throw new NotFoundException();
+    }
+
     return { data: updatedTag.toJSON() };
   }
 
@@ -188,6 +196,10 @@ export class TagController {
   ): Promise<AppResponse<TagEntity>> {
     const updateCategory = await this.tagService.update(id, tagData);
 
+    if (!updateCategory) {
+      throw new NotFoundException();
+    }
+
     return { data: updateCategory.toJSON() };
   }
 
@@ -207,8 +219,17 @@ export class TagController {
   @Scopes(AppScopes.DELETE)
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<AppResponse<number>> {
-    const { deleted } = await this.tagService.remove(id);
+    try {
+      const result = await this.tagService.remove(id);
 
-    return { data: deleted };
+      if (!result) {
+        throw new NotFoundException('category_exception_not_found');
+      }
+
+      return { data: result.deleted };
+    } catch (error) {
+      this.logger.error(error);
+      throw parseErrorsToHttpErrors(error);
+    }
   }
 }

@@ -26,6 +26,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { Public, Resource, Scopes } from 'nest-keycloak-connect';
+import errors from '../../../errors/errors_messages.json';
 import { ProductCategoryEntity } from '../../models';
 import { AppResources, AppScopes } from '../../shared/constants';
 import { IAppQueryString } from '../../shared/interfaces';
@@ -127,7 +128,13 @@ export class ProductCategoryController {
       const category = await this.productCategoryService.findById(id);
 
       if (!category) {
-        throw new NotFoundException('product_category_exception_not-found');
+        throw new NotFoundException(
+          errors['product_category_exception_not-found'],
+          {
+            cause: new Error(errors['product_category_exception_not-found']),
+            description: errors['product_category_exception_not-found'],
+          },
+        );
       }
 
       return { data: category.toJSON() };
@@ -189,6 +196,16 @@ export class ProductCategoryController {
       const updatedProductCategory =
         await this.productCategoryService.overwrite(id, data);
 
+      if (!updatedProductCategory) {
+        throw new NotFoundException(
+          errors['product_category_exception_not-found'],
+          {
+            cause: new Error(errors['product_category_exception_not-found']),
+            description: errors['product_category_exception_not-found'],
+          },
+        );
+      }
+
       return { data: updatedProductCategory };
     } catch (error) {
       this.logger.error(`PRODUCT_CATEGORY_OVERWRITE: ${error}`);
@@ -221,6 +238,16 @@ export class ProductCategoryController {
         data,
       );
 
+      if (!updatedProductCategory) {
+        throw new NotFoundException(
+          errors['product_category_exception_not-found'],
+          {
+            cause: new Error(errors['product_category_exception_not-found']),
+            description: errors['product_category_exception_not-found'],
+          },
+        );
+      }
+
       return { data: updatedProductCategory };
     } catch (error) {
       this.logger.error(`PRODUCT_CATEGORY_UPDATE: ${error}`);
@@ -243,9 +270,19 @@ export class ProductCategoryController {
   @Delete(':id')
   public async remove(@Param('id') id: string): Promise<AppResponse<number>> {
     try {
-      const { deleted } = await this.productCategoryService.remove(id);
+      const result = await this.productCategoryService.remove(id);
 
-      return { data: deleted };
+      if (!result) {
+        throw new NotFoundException(
+          errors['product_category_exception_not-found'],
+          {
+            cause: new Error(errors['product_category_exception_not-found']),
+            description: errors['product_category_exception_not-found'],
+          },
+        );
+      }
+
+      return { data: result.deleted };
     } catch (error) {
       this.logger.error(`PRODUCT_CATEGORY_REMOVE: ${error}`);
       throw parseErrorsToHttpErrors(error);

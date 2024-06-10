@@ -5,7 +5,6 @@ import { Column, HasMany, Table } from 'sequelize-typescript';
 import { WrapperType } from '../shared/types';
 import { BaseEntity, IBaseAttributes } from './base.entity';
 import { ProductEntity } from './product.entity';
-import { StockEntity } from './stock.entity';
 
 export interface IProductCategoryAttributes extends IBaseAttributes {
   name: string;
@@ -39,9 +38,4 @@ export class ProductCategoryEntity extends BaseEntity<
   @Field(() => [ProductEntity!]!)
   @HasMany(() => ProductEntity)
   products: WrapperType<ProductEntity[]>;
-
-  @ApiProperty({ type: () => [StockEntity] })
-  @Field(() => [StockEntity!]!)
-  @HasMany(() => StockEntity)
-  stocks: WrapperType<StockEntity[]>;
 }

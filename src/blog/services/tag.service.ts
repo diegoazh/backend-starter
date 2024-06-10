@@ -1,18 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PostEntity, TagEntity } from '../../models';
 import { IAppQueryString } from '../../shared/interfaces';
-import { NodeConfigService } from '../../shared/services/node-config.service';
 import { buildPartialFindOptions } from '../../shared/utils/fns';
 import { CreateTagDto } from '../dto/create-tag.dto';
 import { PatchCategoryDto } from '../dto/patch-category.dto';
 
 @Injectable()
 export class TagService {
-  constructor(
-    @InjectModel(TagEntity) private readonly Tag: typeof TagEntity,
-    private readonly nodeConfig: NodeConfigService,
-  ) {}
+  constructor(@InjectModel(TagEntity) private readonly Tag: typeof TagEntity) {}
 
   public find(query: IAppQueryString): Promise<TagEntity[]> {
     const { filter, order, pageIndex = 0, pageSize = 0 } = query;
@@ -27,12 +23,12 @@ export class TagService {
     });
   }
 
-  public findById(id: string): Promise<TagEntity> {
+  public findById(id: string): Promise<TagEntity | null> {
     return this.Tag.findByPk(id);
   }
 
-  public async count(query?: IAppQueryString): Promise<{ count: number }> {
-    const { filter } = query;
+  public async count(query: IAppQueryString): Promise<{ count: number }> {
+    const { filter = {} } = query;
 
     const count = await this.Tag.count({
       where: {
@@ -49,16 +45,24 @@ export class TagService {
     });
   }
 
-  public async overwrite(id: string, data: CreateTagDto): Promise<TagEntity> {
+  public async overwrite(
+    id: string,
+    data: CreateTagDto,
+  ): Promise<TagEntity | null> {
     const tagFound = await this.findById(id);
 
     if (tagFound) {
       tagFound.set({ ...data });
-      return tagFound.save();
+      await tagFound.save();
     }
+
+    return tagFound;
   }
 
-  public async update(id: string, data: PatchCategoryDto): Promise<TagEntity> {
+  public async update(
+    id: string,
+    data: PatchCategoryDto,
+  ): Promise<TagEntity | null> {
     const tagFound = await this.findById(id);
 
     if (tagFound) {
@@ -68,14 +72,14 @@ export class TagService {
 
       return tagFound.save();
     }
+
+    return tagFound;
   }
 
-  public async remove(id: string): Promise<{ deleted: number }> {
+  public async remove(id: string): Promise<{ deleted: number } | null> {
     const tagFound = await this.findById(id);
 
-    if (!tagFound) {
-      throw new NotFoundException('category_exception_not_found');
-    }
+    if (!tagFound) return tagFound;
 
     const deleted = await this.Tag.destroy({ where: { id } });
 

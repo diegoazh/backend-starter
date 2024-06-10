@@ -91,11 +91,11 @@ export class ProductEntity extends BaseEntity<
   })
   status: (typeof ProductStatus)[keyof typeof ProductStatus];
 
-  @ApiProperty()
   @Field(() => String!)
   @ForeignKey(() => ProductCategoryEntity)
   productCategoryId: string;
 
+  @ApiProperty({ type: () => ProductCategoryEntity })
   @Field(() => ProductCategoryEntity, { nullable: true })
   @BelongsTo(() => ProductCategoryEntity)
   productCategory: WrapperType<ProductCategoryEntity>;

@@ -77,39 +77,45 @@ export class ProductService {
   public async overwrite(
     id: string,
     data: UpdateProductDto,
-  ): Promise<ProductEntity> {
-    const product = await this.findById(id);
+  ): Promise<ProductEntity | null> {
+    const savedProduct = await this.findById(id);
 
-    // TODO: use Object.keys over product to overwrite all its properties
-    product.available = data.available;
-    product.description = data.description;
-    product.images = data.images;
-    product.name = data.name;
-    product.updatedAt = new Date();
-    await product.save();
+    if (savedProduct) {
+      Object.keys(data).forEach((key) => {
+        savedProduct[key] = data[key];
+      });
 
-    return product;
+      await savedProduct.save();
+    }
+
+    return savedProduct;
   }
 
   public async update(
     id: string,
     data: PatchProductDto,
-  ): Promise<ProductEntity> {
-    const product = await this.findById(id);
+  ): Promise<ProductEntity | null> {
+    const savedProduct = await this.findById(id);
 
-    // TODO: use Object.keys over product to only update properties sent properties
-    product.available = data?.available ?? product.available;
-    product.description = data?.description ?? product.description;
-    product.images = data?.images ?? product.images;
-    product.name = data?.name ?? product.name;
-    product.updatedAt = new Date();
-    await product.save();
+    if (savedProduct) {
+      Object.keys(data).forEach((key) => {
+        if (data[key] != null) {
+          savedProduct[key] = data[key];
+        }
+      });
 
-    return product;
+      await savedProduct.save();
+    }
+
+    return savedProduct;
   }
 
-  public async remove(id: string): Promise<{ deleted: number }> {
+  public async remove(id: string): Promise<{ deleted: number } | null> {
     const product = await this.findById(id);
+
+    if (!product) {
+      return product;
+    }
 
     await product.destroy();
 

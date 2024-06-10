@@ -122,23 +122,22 @@ export class UserService {
     id: string,
     data: UpdateUserDto,
     authorization: string,
-  ): Promise<UserModel | undefined> {
+  ): Promise<UserModel | null> {
     try {
       const savedUser = await this.findById(id, authorization);
 
-      if (savedUser) {
-        const url = `${this.usersUrl}/${id}`;
+      if (!savedUser) return savedUser;
 
-        const res = await request(url, {
-          headers: { ...this.defaultHeaders, authorization },
-          method: 'PUT',
-          body: JSON.stringify(data),
-        });
+      const url = `${this.usersUrl}/${id}`;
+      const res = await request(url, {
+        headers: { ...this.defaultHeaders, authorization },
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
 
-        await keycloakResponseChecker(res);
+      await keycloakResponseChecker(res);
 
-        return await this.findById(id, authorization);
-      }
+      return await this.findById(id, authorization);
     } catch (error) {
       this.logger.error(`USER_OVERWRITE: ${error}`);
       throw error;
@@ -149,56 +148,56 @@ export class UserService {
     id: string,
     data: PatchUserDto,
     authorization: string,
-  ): Promise<UserModel | undefined> {
+  ): Promise<UserModel | null> {
     try {
       const savedUser = await this.findById(id, authorization);
 
-      if (savedUser) {
-        const url = `${this.usersUrl}/${id}`;
-        const body: PatchUserDto = {};
+      if (!savedUser) return savedUser;
 
-        if (data.email) {
-          body.email = data.email;
-        }
+      const url = `${this.usersUrl}/${id}`;
+      const body: PatchUserDto = {};
 
-        if (data.emailVerified != null) {
-          body.emailVerified = data.emailVerified;
-        }
-
-        if (data.enabled != null) {
-          body.enabled = data.enabled;
-        }
-
-        if (data.firstName) {
-          body.firstName = data.firstName;
-        }
-
-        if (data.groups != null) {
-          body.groups = [...data.groups];
-        }
-
-        if (data.requiredActions) {
-          body.requiredActions = [...data.requiredActions];
-        }
-
-        if (data.lastName) {
-          body.lastName = data.lastName;
-        }
-
-        if (data.username) {
-          body.username = data.username;
-        }
-
-        const res = await request(url, {
-          headers: { ...this.defaultHeaders, authorization },
-          method: 'PUT',
-          body: JSON.stringify(data),
-        });
-
-        await keycloakResponseChecker(res);
-
-        return await this.findById(id, authorization);
+      if (data.email) {
+        body.email = data.email;
       }
+
+      if (data.emailVerified != null) {
+        body.emailVerified = data.emailVerified;
+      }
+
+      if (data.enabled != null) {
+        body.enabled = data.enabled;
+      }
+
+      if (data.firstName) {
+        body.firstName = data.firstName;
+      }
+
+      if (data.groups != null) {
+        body.groups = [...data.groups];
+      }
+
+      if (data.requiredActions) {
+        body.requiredActions = [...data.requiredActions];
+      }
+
+      if (data.lastName) {
+        body.lastName = data.lastName;
+      }
+
+      if (data.username) {
+        body.username = data.username;
+      }
+
+      const res = await request(url, {
+        headers: { ...this.defaultHeaders, authorization },
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+
+      await keycloakResponseChecker(res);
+
+      return await this.findById(id, authorization);
     } catch (error) {
       this.logger.error(`USER_UPDATE: ${error}`);
       throw error;

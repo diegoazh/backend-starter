@@ -1,4 +1,5 @@
 {
+  "exception_internal-server-error": "Unexpected error occurs on the server, we are working to solve it",
   "user_pwd_max-length": "The maximum length of the password is 32 characters",
   "user_pwd_min-length": "The password must be at least of 8 characters",
   "user_username_max-length": "The maximum length of the username is 32 characters",
@@ -9,7 +10,6 @@
   "post_exception_not-found": "Any post was found",
   "category_exception_not-found": "Any category was found",
   "tag_exception_not-found": "Any tag was found",
-  "exception_internal-server-error": "Unexpected error occurs on the server, we are working to solve it",
   "product_name_max-length": "The maximum length of the name is 250 characters",
   "product_name_min-length": "The minimum length of the name is 3 characters",
   "product_images_max-length": "The maximum length of the images is 3000 characters",
@@ -17,5 +17,7 @@
   "product_categoryId_max-length": "The maximum length of the categoryId is 1000 characters",
   "product_exception_not-found": "Any product was found",
   "product_category_name_max-length": "The maximum length of the name is 250 characters",
-  "product_category_name_min-length": "The minimum length of the name is 3 characters"
+  "product_category_name_min-length": "The minimum length of the name is 3 characters",
+  "product_category_exception_not-found": "Any product was found",
+  "stock_exception_not-found": "Any product was found"
 }

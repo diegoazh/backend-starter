@@ -1,5 +1,12 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
+import { DineroOptions } from 'dinero.js';
+import GraphQLJSON from 'graphql-type-json';
 import { Optional } from 'sequelize';
 import {
   BelongsTo,
@@ -9,18 +16,21 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { StockType } from '../e-commerce/constants/stock.constant';
-import { BaseEntity, IBaseAttributes } from './base.entity';
 import { WrapperType } from '../shared/types';
-import { ProductCategoryEntity } from './product-category.entity';
+import { DineroOptionsModel } from '../shared/utils';
+import { BaseEntity, IBaseAttributes } from './base.entity';
 import { ProductEntity } from './product.entity';
 
+registerEnumType(StockType, {
+  name: 'StockType',
+});
+
 export interface IStockAttributes extends IBaseAttributes {
-  productCategoryId: string;
   productId: string;
-  price: number;
+  price: DineroOptions<number>;
   quantity: number;
-  type: ['ONSITE', 'ONLINE'];
-  priceHistory: string;
+  type: (typeof StockType)[keyof typeof StockType];
+  priceHistory: JSON;
 }
 
 export interface IStockCreationAttributes
@@ -36,41 +46,37 @@ export class StockEntity extends BaseEntity<
   IStockAttributes,
   IStockCreationAttributes
 > {
-  @ApiProperty()
-  @Field(() => String!)
-  @ForeignKey(() => ProductCategoryEntity)
-  productCategoryId: string;
-
-  @Field(() => ProductCategoryEntity, { nullable: true })
-  @BelongsTo(() => ProductCategoryEntity)
-  productCategory: WrapperType<ProductCategoryEntity>;
+  @ApiProperty({
+    type: () => DineroOptionsModel,
+  })
+  @Field(() => GraphQLJSON)
+  @Column({ type: DataType.JSON })
+  price: DineroOptions<number>;
 
   @ApiProperty()
+  @Field(() => Number)
+  @Column
+  quantity: number;
+
+  @ApiProperty({ enum: Object.values(StockType) })
+  @Field(() => StockType)
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(StockType),
+  })
+  type: (typeof StockType)[keyof typeof StockType];
+
+  @ApiProperty({ type: String })
+  @Field(() => GraphQLJSON)
+  @Column({ type: DataType.JSON })
+  priceHistory: JSON;
+
   @Field(() => String!)
   @ForeignKey(() => ProductEntity)
   productId: string;
 
+  @ApiProperty({ type: () => ProductEntity })
   @Field(() => ProductEntity, { nullable: true })
   @BelongsTo(() => ProductEntity)
   product: WrapperType<ProductEntity>;
-
-  @ApiProperty()
-  @Field()
-  @Column
-  price: number;
-
-  @ApiProperty()
-  @Field()
-  @Column
-  quantity: number;
-
-  @ApiProperty()
-  @Field()
-  @Column({ type: DataType.ENUM, values: Object.values(StockType) })
-  type: (typeof StockType)[keyof typeof StockType];
-
-  @ApiProperty()
-  @Field()
-  @Column
-  priceHistory: string;
 }

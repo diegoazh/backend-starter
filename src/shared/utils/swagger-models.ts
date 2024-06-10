@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IPostAttributes, ITagAttributes, PostTagEntity } from '../../models';
+import { Currency, DineroOptions } from 'dinero.js';
 import { PostType } from '../../blog/constants/blog.constant';
+import { IPostAttributes, ITagAttributes, PostTagEntity } from '../../models';
 import { WrapperType } from '../types';
 
 export class TagExtendedModel implements ITagAttributes {
@@ -62,4 +63,28 @@ export class PostExtendedModel implements IPostAttributes {
 
   @ApiProperty()
   deletedAt: Date;
+}
+
+export class CurrencyModel implements Currency<number> {
+  @ApiProperty({
+    oneOf: [{ type: 'number' }, { type: 'array', items: { type: 'number' } }],
+  })
+  base: number | readonly number[];
+
+  @ApiProperty()
+  code: string;
+
+  @ApiProperty()
+  exponent: number;
+}
+
+export class DineroOptionsModel implements DineroOptions<number> {
+  @ApiProperty()
+  amount: number;
+
+  @ApiProperty({ type: () => CurrencyModel })
+  currency: CurrencyModel;
+
+  @ApiProperty()
+  scale?: number;
 }

@@ -4,6 +4,8 @@ const { faker } = require('@faker-js/faker');
 const { v4: uuidv4 } = require('uuid');
 const data = require('../../.data/categories-and-products.json');
 const stocks = require('../../.data/stocks.json');
+const { dinero, toSnapshot } = require('dinero.js');
+const { ARS } = require('@dinero.js/currencies');
 
 module.exports = {
   up: async (queryInterface) => {
@@ -195,29 +197,31 @@ module.exports = {
         transaction,
       });
 
+      const date = new Date(2024, 4, 24, 12, 0, 0, 0);
       const StockTypes = ['ONSITE', 'ONLINE'];
-      const onSiteStock = stocks.onSite.map((stock, index) => {
-        const productStock = {
-          ...stock,
-          type: StockTypes[0],
-          price: +stock.price,
-        };
+      const price = toSnapshot(dinero({ amount: 0, currency: ARS }));
+      const onSiteStock = products.map((value) => ({
+        id: uuidv4(),
+        productId: value.id,
+        price: JSON.stringify(price),
+        quantity: 0,
+        type: StockTypes[0],
+        priceHistory: null,
+        createdAt: date,
+        updatedAt: date,
+      }));
 
-        const foundCategory = productCategories.find(
-          (category) =>
-            category.name.toLowerCase() ===
-            stock.productCategoryId.toLowerCase(),
-        );
+      console.info('Stocks', JSON.stringify(onSiteStock, null, 2));
+
+      await queryInterface.bulkInsert('Stocks', onSiteStock, {
+        transaction,
+      });
+
+      const onSiteStockUpdated = stocks.onSite.map((stock, index) => {
         const foundProduct = products.find(
           (product) =>
             product.name.toLowerCase() === stock.productId.toLowerCase(),
         );
-
-        if (!foundCategory) {
-          throw new Error(
-            `loading stock we can't found category [${stock.productCategoryId}] - [${stock.productId}] - [${index}]`,
-          );
-        }
 
         if (!foundProduct) {
           throw new Error(
@@ -225,26 +229,70 @@ module.exports = {
           );
         }
 
-        productStock.productCategoryId = foundCategory.id;
-        productStock.productId = foundProduct.id;
-        productStock.id = uuidv4();
-        productStock.createdAt = faker.date.recent({
-          days: 10,
-          refDate: currentDate,
-        });
-        productStock.updatedAt = faker.date.recent({
-          days: 10,
-          refDate: currentDate,
-        });
+        const foundStock = onSiteStock.find(
+          (s) => s.productId === foundProduct.id,
+        );
+        foundStock.quantity = stock.quantity;
 
-        return productStock;
+        try {
+          foundStock.price = JSON.stringify(
+            toSnapshot(dinero({ amount: +stock.price, currency: ARS })),
+          );
+
+          if (stock.priceHistory) {
+            const history = Object.entries(stock.priceHistory);
+            const parsedHistory = history.reduce(
+              (res, [key, value]) => ({
+                ...res,
+                [key]: toSnapshot(dinero({ amount: +value, currency: ARS })),
+              }),
+              {},
+            );
+            foundStock.priceHistory = JSON.stringify(parsedHistory);
+          } else {
+            foundStock.priceHistory = JSON.stringify({
+              '2024-05-24T12:00:00.000Z': JSON.parse(foundStock.price),
+            });
+          }
+        } catch (error) {
+          throw new Error(`trying to parse: [${stock.price}]`);
+        }
+
+        return foundStock;
       });
 
-      console.info('Stocks', JSON.stringify(onSiteStock, null, 2));
+      onSiteStock.forEach((stock) => {
+        if (stock.priceHistory == null) {
+          stock.priceHistory = JSON.stringify({
+            '2024-05-24T12:00:00.000Z': JSON.parse(stock.price),
+          });
 
-      await queryInterface.bulkInsert('Stocks', onSiteStock, {
-        transaction,
+          onSiteStockUpdated.push(stock);
+        }
       });
+
+      console.info(
+        'Update Stocks',
+        JSON.stringify(onSiteStockUpdated, null, 2),
+      );
+
+      const promises = onSiteStockUpdated.map((stock) => {
+        if (!stock) {
+          return undefined;
+        }
+
+        const { id, productId, createdAt, type, updatedAt, ...rest } = stock;
+        console.log(
+          `updating id: ${id}, values: ${JSON.stringify(rest, null, 2)}`,
+        );
+        return queryInterface.bulkUpdate(
+          'Stocks',
+          rest,
+          { id },
+          { transaction },
+        );
+      });
+      await Promise.all(promises);
 
       await transaction.commit();
     } catch (error) {
@@ -257,7 +305,9 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
 
     try {
-      // await queryInterface.bulkDelete('Products');
+      await queryInterface.bulkDelete('Stocks');
+      await queryInterface.bulkDelete('Products');
+      await queryInterface.bulkDelete('ProductCategories');
       await queryInterface.bulkDelete('Comments');
       await queryInterface.bulkDelete('PostsTags');
       await queryInterface.bulkDelete('Posts');

@@ -36,6 +36,7 @@
   "dependencies": {
     "@apollo/server": "^4.9.3",
     "@babel/register": "^7.22.5",
+    "@dinero.js/currencies": "2.0.0-alpha.14",
     "@faker-js/faker": "^8.0.2",
     "@google-cloud/storage": "^7.7.0",
     "@nestjs/apollo": "^12.0.7",
@@ -52,7 +53,9 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "config": "^3.3.9",
+    "dinero.js": "2.0.0-alpha.14",
     "graphql": "^16.8.1",
+    "graphql-type-json": "^0.3.2",
     "helmet": "^7.0.0",
     "nest-keycloak-connect": "^1.9.1",
     "passport": "^0.6.0",

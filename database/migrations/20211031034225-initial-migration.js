@@ -423,14 +423,6 @@ module.exports = {
             primaryKey: true,
             allowNull: false,
           },
-          productCategoryId: {
-            type: Sequelize.UUID,
-            references: {
-              model: 'ProductCategories',
-              key: 'id',
-            },
-            onDelete: 'SET NULL',
-          },
           productId: {
             type: Sequelize.UUID,
             references: {
@@ -440,8 +432,7 @@ module.exports = {
             onDelete: 'SET NULL',
           },
           price: {
-            type: Sequelize.DECIMAL(12, 2),
-            defaultValue: 0,
+            type: Sequelize.JSON,
             allowNull: false,
           },
           quantity: {

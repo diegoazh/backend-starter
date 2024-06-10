@@ -13,9 +13,10 @@ import {
 import { join } from 'path';
 import dbConfig from '../config/db.config';
 import { BlogModule } from './blog/blog.module';
+import { ECommerceModule } from './e-commerce/e-commerce.module';
 import { KeycloakModule } from './keycloak/keycloak.module';
 import * as models from './models';
-import { KeycloakConfigService } from './shared/services';
+import GraphQLJSON from 'graphql-type-json';
 import { SharedModule } from './shared/shared.module';
 import { UsersModule } from './user/users.module';
 
@@ -43,6 +44,7 @@ import { UsersModule } from './user/users.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      resolvers: { JSON: GraphQLJSON },
     }),
     SharedModule,
     KeycloakModule,
